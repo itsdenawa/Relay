@@ -7,6 +7,11 @@ export {
   updateTaskAction,
 } from "./api/actions";
 export {
+  useLiveProjectTasks,
+  type RealtimeStatus,
+  type TaskMoveRequest,
+} from "./api/use-live-project-tasks";
+export {
   initialTaskActionState,
   type TaskActionState,
 } from "./model/action-state";

@@ -46,7 +46,8 @@ Owner transfer uses a dedicated transactional RPC. Direct table policies still c
 - Workspace management uses narrow RPCs for atomic creation, email-matched invitation acceptance, membership changes, leaving, and Owner transfer. Invitation rows store only SHA-256 token hashes and public previews expose masked email hints.
 - `create_project` authorizes Owner/Admin access and creates a project with its five ordered default columns atomically, so partially initialized boards cannot be produced through the application flow.
 - Task creation, editing, movement, and archive/restore use narrow security-definer RPCs. Each function verifies active-project state and workspace membership; assignment and labels must belong to the task workspace/project.
-- `move_task` locks the task and target column, then appends the task using a stable gapped position in one transaction. Stage 8 can build DnD and position normalization on this invariant without trusting client-computed ordering.
+- `move_task` locks the task and target column, validates optional previous and next task IDs, and calculates the new gapped position in one transaction. When adjacent positions are exhausted, it safely normalizes the target column before completing the move. The client never supplies a raw database position.
+- `tasks` uses full replica identity and belongs to the `supabase_realtime` publication. Realtime delivery still passes through the authenticated user's task RLS policy.
 
 ## Verification
 

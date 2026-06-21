@@ -4,7 +4,7 @@ Relay is an English-language project management SaaS for small product and creat
 
 ## Current state
 
-Stages 1–7 are implemented: the responsive application shell and workspace-isolated database now include complete authentication, multiple workspace URLs and switching, role-aware member management, secure email invitations, independent project boards, and a functional Kanban workflow with task CRUD, filtering, labels, assignment, archive/restore, and transactional movement.
+Stages 1–8 are implemented: the responsive application shell and workspace-isolated database now include complete authentication, multiple workspace URLs and switching, role-aware member management, secure email invitations, independent project boards, and a functional Kanban workflow with task CRUD, filtering, labels, assignment, archive/restore, accessible drag and drop, optimistic rollback, and Realtime synchronization.
 
 ## Requirements
 
@@ -64,7 +64,7 @@ The application shell adapts at three levels:
 - Tablet: compact icon navigation with the same content hierarchy.
 - Mobile: touch-friendly header, navigation drawer, and fixed quick navigation.
 
-The dashboard reports live project and task totals. Project boards are fully functional without drag and drop; accessible DnD, optimistic updates, and Realtime synchronization arrive in stage 8.
+The dashboard reports live project and task totals. Project boards support mouse, touch, and keyboard drag and drop, with an explicit move menu available as a fallback. Moves appear optimistically, roll back on failure, and reconcile with the server through Supabase Realtime.
 
 ## Architecture
 

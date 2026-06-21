@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { Task } from "../api/get-project-tasks";
+import type { Task } from "../model/types";
 import { filterTasks } from "./filter-tasks";
 
 const tasks: Task[] = [

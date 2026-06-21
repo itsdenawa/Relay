@@ -88,9 +88,9 @@ test.describe("project lifecycle", () => {
       archivedProject.getByRole("button", { name: "Edit" }),
     ).toHaveCount(0);
     await archivedProject.getByRole("link", { name: "Open board" }).click();
-    await expect(page.getByRole("status")).toContainText(
-      "This project is archived",
-    );
+    await expect(
+      page.getByRole("status").filter({ hasText: "This project is archived" }),
+    ).toBeVisible();
     await expect(page.getByRole("button", { name: "Edit" })).toHaveCount(0);
 
     await page.goto(`/w/${seededUser.workspaceSlug}/projects?archived=1`);

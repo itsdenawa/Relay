@@ -621,7 +621,12 @@ export type Database = {
         Returns: undefined;
       };
       move_task: {
-        Args: { target_column_id: string; target_task_id: string };
+        Args: {
+          next_task_id?: string;
+          previous_task_id?: string;
+          target_column_id: string;
+          target_task_id: string;
+        };
         Returns: {
           new_column_id: string;
           new_position: number;

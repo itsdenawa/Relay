@@ -1,4 +1,4 @@
-import type { Task, TaskPriority } from "../api/get-project-tasks";
+import type { Task, TaskPriority } from "../model/types";
 
 export type TaskFilters = {
   query?: string | undefined;

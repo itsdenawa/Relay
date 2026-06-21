@@ -27,7 +27,7 @@ select has_function(
 select has_function(
   'public',
   'move_task',
-  array['uuid', 'uuid'],
+  array['uuid', 'uuid', 'uuid', 'uuid'],
   'transactional task movement function exists'
 );
 

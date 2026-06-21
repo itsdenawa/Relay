@@ -259,9 +259,10 @@ export function ProjectBoardPage({
             <KanbanBoard
               context={context}
               columns={columns}
-              tasks={visibleTasks}
+              tasks={tasks}
               labels={labels}
               members={members}
+              filters={filters}
               readOnly={readOnly}
               highlightedTaskId={createdTaskId ?? savedTaskId}
             />

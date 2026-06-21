@@ -2,7 +2,9 @@
 
 ## Board workflow
 
-`/w/[slug]/p/[projectId]/board` renders the five project columns as a horizontally scrollable Kanban board on smaller screens and a five-column grid on wide screens. Stage 7 deliberately uses a keyboard-operable move selector instead of drag and drop; DnD and Realtime synchronization are stage 8 work.
+`/w/[slug]/p/[projectId]/board` renders the five project columns as a horizontally scrollable Kanban board on smaller screens and a five-column grid on wide screens. Tasks can move within or between columns with a mouse, touch input, or keyboard. The move selector remains available as an explicit fallback.
+
+Keyboard drag and drop starts and ends with Space or Enter. Arrow keys move the active task through available drop targets, and Escape cancels the operation. Motion is disabled when the operating system requests reduced motion.
 
 Each task supports:
 
@@ -39,10 +41,16 @@ The application uses PostgreSQL RPCs rather than multi-request client mutations:
 
 - `create_task` validates related records, appends a stable position, and assigns labels atomically;
 - `update_task` validates and replaces task fields and labels atomically;
-- `move_task` locks the task and target column before assigning the next gapped position;
+- `move_task` locks the task and target column, validates the requested adjacent tasks, and assigns a position between them;
 - `set_task_archived` archives a task or restores it at a collision-free position.
 
-Positions use gaps of 1,024. Stage 8 will add fine-grained ordering and normalization for DnD while retaining the move selector as the accessible fallback.
+Positions use gaps of 1,024. When no integer gap remains between two adjacent tasks, `move_task` normalizes the target column inside the same transaction and then applies the requested order. The client sends neighbor IDs rather than trusting a client-computed database position.
+
+## Optimistic updates and Realtime
+
+The board stores its client-side task list in TanStack Query. A drag immediately updates that cache; a rejected RPC restores the previous snapshot and shows an error toast. Every settled mutation invalidates the query so the database remains the final source of truth.
+
+Supabase Realtime listens for task changes scoped to the active project. Events and successful channel subscriptions invalidate the task query, covering both cross-client changes and reconciliation after reconnects. Row Level Security continues to determine which task changes each connected user can receive. A compact board indicator reports whether live updates are connected or reconnecting.
 
 ## Verification
 
@@ -53,4 +61,4 @@ pnpm test:e2e
 pnpm build
 ```
 
-The database suite covers field validation, relationship integrity, archive behavior, stable movement, active-project requirements, and Owner/Admin/Member/outsider/anonymous permissions. The browser suite covers full task creation and editing, filters, movement, archive/restore, Member behavior, and the 320 px layout.
+The database suite covers field validation, relationship integrity, archive behavior, exact ordering and normalization, active-project requirements, Realtime configuration, and Owner/Admin/Member/outsider/anonymous permissions. The browser suite covers full task creation and editing, filters, mouse/touch/keyboard movement, optimistic rollback, cross-client Realtime updates, archive/restore, Member behavior, and the 320 px layout.

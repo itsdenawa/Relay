@@ -36,7 +36,9 @@ test.describe("task lifecycle", () => {
     await page.getByRole("button", { name: "Labels" }).click();
     await page.getByLabel("New label").fill("Feature");
     await page.getByRole("button", { name: "Create label" }).click();
-    await expect(page.getByRole("status")).toContainText("Label created");
+    await expect(page.getByRole("dialog").getByRole("status")).toContainText(
+      "Label created",
+    );
     await expect(
       page.getByRole("dialog").getByText("Feature", { exact: true }),
     ).toBeVisible();
@@ -73,14 +75,16 @@ test.describe("task lifecycle", () => {
     await editTaskDialog.getByLabel("Priority").selectOption("urgent");
     await editTaskDialog.getByRole("button", { name: "Save task" }).click();
     await expect(page).toHaveURL(/saved=/);
-    await expect(page.getByRole("status")).toContainText("Task details saved");
+    await expect(
+      page.getByText("Task details saved.", { exact: true }),
+    ).toBeVisible();
 
     await page.getByLabel("Search tasks").fill("Publish");
     await page.getByLabel("Filter by priority").selectOption("urgent");
     await page.getByLabel("Filter by label").selectOption({ label: "Feature" });
     await page.getByRole("button", { name: "Apply" }).click();
     await expect(page).toHaveURL(/q=Publish/);
-    await expect(page.getByRole("status")).toContainText("Showing 1 of 1");
+    await expect(page.getByText("Showing 1 of 1 active tasks.")).toBeVisible();
 
     await page.getByRole("link", { name: "Clear filters" }).click();
     const updatedTask = page.getByRole("article", {
@@ -103,14 +107,18 @@ test.describe("task lifecycle", () => {
       .getByRole("button", { name: "Archive Publish launch brief" })
       .click();
     await expect(page).toHaveURL(/archived=1&changed=archived/);
-    await expect(page.getByRole("status")).toContainText("Task archived");
+    await expect(
+      page.getByText("Task archived.", { exact: true }),
+    ).toBeVisible();
     await expect(
       page.getByRole("article", { name: "Publish launch brief" }),
     ).toBeVisible();
 
     await page.getByRole("button", { name: "Restore task" }).click();
     await expect(page).toHaveURL(/changed=restored/);
-    await expect(page.getByRole("status")).toContainText("Task restored");
+    await expect(
+      page.getByText("Task restored to the board.", { exact: true }),
+    ).toBeVisible();
     await expect(
       page
         .getByRole("article", { name: "In progress" })
