@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   closestCenter,
   DndContext,
@@ -109,6 +111,7 @@ function TaskCard({
   highlighted = false,
   moving = false,
   reducedMotion = false,
+  detailsHref,
 }: {
   context: TaskContext;
   task: Task;
@@ -119,6 +122,7 @@ function TaskCard({
   highlighted?: boolean;
   moving?: boolean;
   reducedMotion?: boolean;
+  detailsHref: string;
 }) {
   const {
     attributes,
@@ -178,7 +182,13 @@ function TaskCard({
 
       <div className="flex items-start gap-2">
         <h3 className="min-w-0 flex-1 text-sm leading-5 font-medium">
-          {task.title}
+          <Link
+            href={detailsHref}
+            scroll={false}
+            className="rounded-sm hover:underline focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none"
+          >
+            {task.title}
+          </Link>
         </h3>
         {!readOnly ? (
           <Button
@@ -294,6 +304,7 @@ function KanbanColumn({
   highlightedTaskId,
   movingTaskId,
   reducedMotion,
+  detailsHrefFor,
 }: {
   context: TaskContext;
   column: ProjectBoardColumn;
@@ -305,6 +316,7 @@ function KanbanColumn({
   highlightedTaskId?: string | undefined;
   movingTaskId?: string | undefined;
   reducedMotion: boolean;
+  detailsHrefFor: (taskId: string) => string;
 }) {
   const { isOver, setNodeRef } = useDroppable({
     id: `column:${column.id}`,
@@ -345,6 +357,7 @@ function KanbanColumn({
               highlighted={task.id === highlightedTaskId}
               moving={task.id === movingTaskId}
               reducedMotion={reducedMotion}
+              detailsHref={detailsHrefFor(task.id)}
             />
           ))}
           {!tasks.length ? (
@@ -405,6 +418,16 @@ export function KanbanBoard({
   });
   const [activeTaskId, setActiveTaskId] = useState<string>();
   const [reducedMotion, setReducedMotion] = useState(false);
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const detailsHrefFor = useCallback(
+    (taskId: string) => {
+      const nextParams = new URLSearchParams(searchParams.toString());
+      nextParams.set("task", taskId);
+      return `${pathname}?${nextParams.toString()}`;
+    },
+    [pathname, searchParams],
+  );
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     const updatePreference = () => setReducedMotion(mediaQuery.matches);
@@ -578,6 +601,7 @@ export function KanbanBoard({
                 highlightedTaskId={highlightedTaskId}
                 movingTaskId={movingTaskId}
                 reducedMotion={reducedMotion}
+                detailsHrefFor={detailsHrefFor}
               />
             ))}
           </div>
@@ -605,6 +629,17 @@ export function ArchivedTaskList({
   members,
   readOnly = false,
 }: Omit<KanbanBoardProps, "columns">) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const detailsHrefFor = useCallback(
+    (taskId: string) => {
+      const nextParams = new URLSearchParams(searchParams.toString());
+      nextParams.set("task", taskId);
+      return `${pathname}?${nextParams.toString()}`;
+    },
+    [pathname, searchParams],
+  );
+
   return tasks.length ? (
     <section
       aria-label="Archived tasks"
@@ -626,7 +661,15 @@ export function ArchivedTaskList({
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h2 className="truncate font-medium">{task.title}</h2>
+                <h2 className="truncate font-medium">
+                  <Link
+                    href={detailsHrefFor(task.id)}
+                    scroll={false}
+                    className="rounded-sm hover:underline focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none"
+                  >
+                    {task.title}
+                  </Link>
+                </h2>
                 <p className="mt-1 text-xs text-muted-foreground">
                   {priorityLabels[task.priority]}
                   {assignee ? ` · ${assignee.displayName}` : " · Unassigned"}

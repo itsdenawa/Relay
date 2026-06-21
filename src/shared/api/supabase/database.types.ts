@@ -108,6 +108,7 @@ export type Database = {
           author_id: string;
           body: string;
           created_at: string;
+          deleted_at: string | null;
           edited_at: string | null;
           id: string;
           project_id: string;
@@ -119,6 +120,7 @@ export type Database = {
           author_id: string;
           body: string;
           created_at?: string;
+          deleted_at?: string | null;
           edited_at?: string | null;
           id?: string;
           project_id: string;
@@ -130,6 +132,7 @@ export type Database = {
           author_id?: string;
           body?: string;
           created_at?: string;
+          deleted_at?: string | null;
           edited_at?: string | null;
           id?: string;
           project_id?: string;
@@ -545,6 +548,16 @@ export type Database = {
           workspace_id: string;
           workspace_slug: string;
         }[];
+      };
+      create_attachment: {
+        Args: {
+          attachment_content_type: string;
+          attachment_file_name: string;
+          attachment_size_bytes: number;
+          attachment_storage_path: string;
+          target_task_id: string;
+        };
+        Returns: string;
       };
       create_project: {
         Args: {

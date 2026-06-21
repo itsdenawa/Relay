@@ -48,6 +48,8 @@ Owner transfer uses a dedicated transactional RPC. Direct table policies still c
 - Task creation, editing, movement, and archive/restore use narrow security-definer RPCs. Each function verifies active-project state and workspace membership; assignment and labels must belong to the task workspace/project.
 - `move_task` locks the task and target column, validates optional previous and next task IDs, and calculates the new gapped position in one transaction. When adjacent positions are exhausted, it safely normalizes the target column before completing the move. The client never supplies a raw database position.
 - `tasks` uses full replica identity and belongs to the `supabase_realtime` publication. Realtime delivery still passes through the authenticated user's task RLS policy.
+- `comments` uses full replica identity and the Realtime publication. User-facing deletion sets `deleted_at`, so filtered subscribers receive the change and remove the comment without a reload; only the author can edit or delete it.
+- `task-attachments` is a private Storage bucket. Object paths are exactly `workspace/project/task/uuid`; Storage RLS resolves that path back to an accessible task, while `create_attachment` registers separate file metadata only after the authenticated uploader's object exists.
 
 ## Verification
 

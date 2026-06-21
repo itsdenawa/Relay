@@ -4,7 +4,7 @@ Relay is an English-language project management SaaS for small product and creat
 
 ## Current state
 
-Stages 1–8 are implemented: the responsive application shell and workspace-isolated database now include complete authentication, multiple workspace URLs and switching, role-aware member management, secure email invitations, independent project boards, and a functional Kanban workflow with task CRUD, filtering, labels, assignment, archive/restore, accessible drag and drop, optimistic rollback, and Realtime synchronization.
+Stages 1–9 are implemented: the responsive application shell and workspace-isolated database now include complete authentication, multiple workspace URLs and switching, role-aware member management, secure email invitations, independent project boards, a Realtime Kanban workflow, URL-addressable task details, live comments, and private file collaboration.
 
 ## Requirements
 
@@ -34,7 +34,7 @@ Apply all migrations, seed data, and database verification gates:
 pnpm db:verify
 ```
 
-Supabase Studio is available at [http://127.0.0.1:54323](http://127.0.0.1:54323). See [database architecture](docs/database.md), [authentication setup](docs/authentication.md), [workspace/member operations](docs/workspaces.md), [project/board operations](docs/projects.md), and [task/Kanban operations](docs/tasks.md).
+Supabase Studio is available at [http://127.0.0.1:54323](http://127.0.0.1:54323). See [database architecture](docs/database.md), [authentication setup](docs/authentication.md), [workspace/member operations](docs/workspaces.md), [project/board operations](docs/projects.md), [task/Kanban operations](docs/tasks.md), and [comments/attachment operations](docs/collaboration.md).
 
 ## Quality commands
 
@@ -65,6 +65,8 @@ The application shell adapts at three levels:
 - Mobile: touch-friendly header, navigation drawer, and fixed quick navigation.
 
 The dashboard reports live project and task totals. Project boards support mouse, touch, and keyboard drag and drop, with an explicit move menu available as a fallback. Moves appear optimistically, roll back on failure, and reconcile with the server through Supabase Realtime.
+
+Task titles open a responsive details panel whose `task` query parameter preserves direct links and active board filters. The panel provides Realtime comments and private attachments with progress-aware uploads and short-lived signed downloads.
 
 ## Architecture
 

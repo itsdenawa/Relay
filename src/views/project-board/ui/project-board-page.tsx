@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ArrowLeft, FolderKanban, Search, X } from "lucide-react";
 
+import type { TaskAttachment } from "@/entities/attachment";
+import type { TaskComment } from "@/entities/comment";
 import type { ProjectBoard } from "@/entities/project";
 import {
   filterTasks,
@@ -17,6 +19,7 @@ import {
 import { cn } from "@/shared/lib";
 import { Badge, Button, Input, NativeSelect } from "@/shared/ui";
 import { ArchivedTaskList, KanbanBoard } from "@/widgets/kanban-board";
+import { TaskDetailsPanel } from "@/widgets/task-details-panel";
 
 type ProjectBoardPageProps = {
   workspace: CurrentWorkspace;
@@ -29,6 +32,10 @@ type ProjectBoardPageProps = {
   createdTaskId?: string | undefined;
   savedTaskId?: string | undefined;
   change?: "archived" | "restored" | undefined;
+  currentUserId: string;
+  selectedTaskId?: string | undefined;
+  initialComments: TaskComment[];
+  initialAttachments: TaskAttachment[];
 };
 
 const priorities = [
@@ -51,6 +58,10 @@ export function ProjectBoardPage({
   createdTaskId,
   savedTaskId,
   change,
+  currentUserId,
+  selectedTaskId,
+  initialComments,
+  initialAttachments,
 }: ProjectBoardPageProps) {
   const { project, columns } = board;
   const canManageProject =
@@ -59,6 +70,7 @@ export function ProjectBoardPage({
   const activeTasks = tasks.filter((task) => !task.archived_at);
   const archivedTasks = tasks.filter((task) => task.archived_at);
   const visibleTasks = filterTasks(activeTasks, filters);
+  const selectedTask = tasks.find((task) => task.id === selectedTaskId);
   const context = {
     workspaceId: workspace.id,
     workspaceSlug: workspace.slug,
@@ -279,6 +291,21 @@ export function ProjectBoardPage({
           />
         </div>
       )}
+
+      {selectedTask ? (
+        <TaskDetailsPanel
+          context={context}
+          task={selectedTask}
+          columns={columns}
+          labels={labels}
+          members={members}
+          currentUserId={currentUserId}
+          currentUserRole={workspace.role}
+          initialComments={initialComments}
+          initialAttachments={initialAttachments}
+          readOnly={Boolean(project.archived_at || selectedTask.archived_at)}
+        />
+      ) : null}
     </div>
   );
 }

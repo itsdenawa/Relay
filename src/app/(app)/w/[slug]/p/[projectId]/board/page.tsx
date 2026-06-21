@@ -1,5 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 
+import { getTaskAttachments } from "@/entities/attachment";
+import { getTaskComments } from "@/entities/comment";
 import { getProjectBoard } from "@/entities/project";
 import { getProjectLabels, getProjectTasks } from "@/entities/task";
 import { getCurrentUser } from "@/entities/user";
@@ -18,6 +20,7 @@ type ProjectBoardRouteProps = {
     created?: string;
     saved?: string;
     changed?: string;
+    task?: string;
   }>;
 };
 
@@ -43,6 +46,14 @@ export default async function ProjectBoardRoute({
   ]);
   if (!board) notFound();
 
+  const selectedTask = tasks.find((task) => task.id === query.task);
+  const [initialComments, initialAttachments] = selectedTask
+    ? await Promise.all([
+        getTaskComments(workspace.id, projectId, selectedTask.id),
+        getTaskAttachments(workspace.id, projectId, selectedTask.id),
+      ])
+    : [[], []];
+
   const priorityResult = taskPrioritySchema.safeParse(query.priority);
   const change =
     query.changed === "archived" || query.changed === "restored"
@@ -66,6 +77,10 @@ export default async function ProjectBoardRoute({
       createdTaskId={query.created}
       savedTaskId={query.saved}
       change={change}
+      currentUserId={user.id}
+      selectedTaskId={selectedTask?.id}
+      initialComments={initialComments}
+      initialAttachments={initialAttachments}
     />
   );
 }

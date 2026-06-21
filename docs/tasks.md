@@ -16,6 +16,8 @@ Each task supports:
 - zero or more project labels;
 - archive and restore without hard deletion.
 
+Selecting a task title adds `task=<task-id>` to the existing board URL and opens its responsive details panel. Closing the panel removes only that parameter, preserving search and filter state. The panel shows the task overview, private files, and live discussion; archived tasks and projects remain readable but cannot receive new comments or files.
+
 The workspace dashboard derives its project and task metrics from live Supabase data.
 
 ## Filters and URLs

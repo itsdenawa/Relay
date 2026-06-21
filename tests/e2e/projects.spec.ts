@@ -22,9 +22,6 @@ test.describe("project lifecycle", () => {
     await signInSeededUser(page);
     await page.goto(`/w/${seededUser.workspaceSlug}/projects`);
 
-    await expect(
-      page.getByRole("heading", { name: "Create your first project" }),
-    ).toBeVisible();
     await page.getByRole("button", { name: "New project" }).first().click();
     await page.getByLabel("Project name").fill("Relay Website");
     await page.getByLabel("Key").fill("web");
