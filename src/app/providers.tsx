@@ -2,9 +2,14 @@
 
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { LazyMotion, MotionConfig } from "motion/react";
 import { ThemeProvider } from "next-themes";
 
+import { WebVitalsReporter } from "@/shared/lib/web-vitals-reporter";
 import { Toaster } from "@/shared/ui/toaster";
+
+const loadMotionFeatures = () =>
+  import("@/shared/lib/motion-features").then((module) => module.default);
 
 export function Providers({
   children,
@@ -24,15 +29,26 @@ export function Providers({
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="system"
-        enableSystem
-        disableTransitionOnChange
-      >
-        {children}
-        <Toaster />
-      </ThemeProvider>
+      <LazyMotion features={loadMotionFeatures} strict>
+        <MotionConfig
+          reducedMotion="user"
+          transition={{
+            duration: 0.18,
+            ease: [0.25, 1, 0.5, 1],
+          }}
+        >
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+            <Toaster />
+            <WebVitalsReporter />
+          </ThemeProvider>
+        </MotionConfig>
+      </LazyMotion>
     </QueryClientProvider>
   );
 }

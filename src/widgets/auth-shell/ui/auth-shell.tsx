@@ -25,7 +25,11 @@ export function AuthShell({
   footer,
 }: AuthShellProps) {
   return (
-    <main className="grid min-h-dvh lg:grid-cols-[minmax(0,1fr)_minmax(30rem,0.82fr)]">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="grid min-h-dvh outline-none lg:grid-cols-[minmax(0,1fr)_minmax(30rem,0.82fr)]"
+    >
       <section className="relative hidden overflow-hidden border-r bg-sidebar p-10 lg:flex lg:flex-col xl:p-14">
         <div
           aria-hidden="true"

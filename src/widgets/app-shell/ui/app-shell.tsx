@@ -20,7 +20,11 @@ export function AppShell({
       <AppSidebar user={user} workspace={workspace} workspaces={workspaces} />
       <div className="min-w-0 md:pl-18 xl:pl-64">
         <AppHeader user={user} workspace={workspace} workspaces={workspaces} />
-        <main className="min-w-0 px-4 pt-6 pb-24 sm:px-6 md:pb-8 lg:px-8 lg:pt-8">
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="min-w-0 px-4 pt-6 pb-24 outline-none sm:px-6 md:pb-8 lg:px-8 lg:pt-8"
+        >
           {children}
         </main>
       </div>

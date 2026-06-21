@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { HelpCircle, Settings } from "lucide-react";
+import * as m from "motion/react-m";
 
 import { AccountMenu } from "@/features/account-menu";
 import { WorkspaceSwitcher } from "@/features/workspace-switcher";
@@ -24,7 +25,11 @@ export function AppSidebar({ user, workspace, workspaces }: AppSidebarProps) {
   const navigation = getPrimaryNavigation(workspace.slug);
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-40 hidden w-18 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex xl:w-64">
+    <m.aside
+      initial={{ x: -12 }}
+      animate={{ x: 0 }}
+      className="fixed inset-y-0 left-0 z-40 hidden w-18 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex xl:w-64"
+    >
       <div className="flex h-16 shrink-0 items-center justify-center border-b border-sidebar-border px-3 xl:justify-start xl:px-5">
         <RelayLogo compact className="xl:hidden" />
         <RelayLogo className="hidden xl:flex" />
@@ -111,6 +116,6 @@ export function AppSidebar({ user, workspace, workspaces }: AppSidebarProps) {
           <AccountMenu {...user} workspaceSlug={workspace.slug} />
         </div>
       </div>
-    </aside>
+    </m.aside>
   );
 }

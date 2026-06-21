@@ -10,7 +10,7 @@ import {
 import type { Project } from "@/entities/project";
 import type { WorkspaceTaskStats } from "@/entities/task";
 import { ProjectFormDialog } from "@/features/project-management";
-import { Badge, Button } from "@/shared/ui";
+import { Badge, Button, MotionItem } from "@/shared/ui";
 
 type DashboardOverviewProps = {
   displayName: string;
@@ -88,28 +88,27 @@ export function DashboardOverview({
         aria-label="Workspace metrics"
         className="mt-7 grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4"
       >
-        {metrics.map(({ label, value, note, icon: Icon, tone }) => (
-          <article
-            key={label}
-            className="rounded-2xl border bg-card p-4 shadow-xs sm:p-5"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-sm text-muted-foreground">{label}</p>
-                <p className="mt-2 truncate text-2xl font-semibold tracking-tight capitalize">
-                  {value}
-                </p>
+        {metrics.map(({ label, value, note, icon: Icon, tone }, index) => (
+          <MotionItem key={label} delay={index * 0.035} className="h-full">
+            <article className="h-full rounded-2xl border bg-card p-4 shadow-xs sm:p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-sm text-muted-foreground">{label}</p>
+                  <p className="mt-2 truncate text-2xl font-semibold tracking-tight capitalize">
+                    {value}
+                  </p>
+                </div>
+                <span
+                  className={`grid size-9 shrink-0 place-items-center rounded-xl ${tone}`}
+                >
+                  <Icon className="size-[1.1rem]" />
+                </span>
               </div>
-              <span
-                className={`grid size-9 shrink-0 place-items-center rounded-xl ${tone}`}
-              >
-                <Icon className="size-[1.1rem]" />
-              </span>
-            </div>
-            <p className="mt-3 truncate text-xs text-muted-foreground">
-              {note}
-            </p>
-          </article>
+              <p className="mt-3 truncate text-xs text-muted-foreground">
+                {note}
+              </p>
+            </article>
+          </MotionItem>
         ))}
       </section>
 
@@ -131,29 +130,30 @@ export function DashboardOverview({
 
         {activeProjects.length ? (
           <div className="grid gap-4 lg:grid-cols-3">
-            {activeProjects.slice(0, 3).map((project) => (
-              <Link
-                key={project.id}
-                href={`/w/${workspace.slug}/p/${project.id}/board`}
-                className="group relative overflow-hidden rounded-2xl border bg-card p-5 shadow-xs transition-[border-color,box-shadow,transform] hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none"
-              >
-                <div
-                  className="absolute inset-x-0 top-0 h-1"
-                  style={{ backgroundColor: project.color }}
-                />
-                <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0">
-                    <Badge variant="outline">{project.key}</Badge>
-                    <h3 className="mt-3 truncate font-semibold">
-                      {project.name}
-                    </h3>
-                    <p className="mt-1.5 line-clamp-2 min-h-10 text-sm leading-5 text-muted-foreground">
-                      {project.description || "No project description yet."}
-                    </p>
+            {activeProjects.slice(0, 3).map((project, index) => (
+              <MotionItem key={project.id} delay={index * 0.035}>
+                <Link
+                  href={`/w/${workspace.slug}/p/${project.id}/board`}
+                  className="group relative block overflow-hidden rounded-2xl border bg-card p-5 shadow-xs transition-[border-color,box-shadow,transform] hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none"
+                >
+                  <div
+                    className="absolute inset-x-0 top-0 h-1"
+                    style={{ backgroundColor: project.color }}
+                  />
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <Badge variant="outline">{project.key}</Badge>
+                      <h3 className="mt-3 truncate font-semibold">
+                        {project.name}
+                      </h3>
+                      <p className="mt-1.5 line-clamp-2 min-h-10 text-sm leading-5 text-muted-foreground">
+                        {project.description || "No project description yet."}
+                      </p>
+                    </div>
+                    <ArrowRight className="mt-1 size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
                   </div>
-                  <ArrowRight className="mt-1 size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
-                </div>
-              </Link>
+                </Link>
+              </MotionItem>
             ))}
           </div>
         ) : (

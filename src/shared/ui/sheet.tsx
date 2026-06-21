@@ -21,10 +21,10 @@ function SheetContent({
 }) {
   return (
     <SheetPrimitive.Portal>
-      <SheetPrimitive.Overlay className="fixed inset-0 z-50 bg-black/45 backdrop-blur-[2px] data-[state=closed]:opacity-0 data-[state=open]:opacity-100" />
+      <SheetPrimitive.Overlay className="fixed inset-0 z-50 bg-black/45 backdrop-blur-[2px] transition-opacity duration-180 ease-out data-[state=closed]:opacity-0 data-[state=open]:opacity-100 motion-reduce:transition-none" />
       <SheetPrimitive.Content
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-[min(21rem,88vw)] flex-col border-r bg-background shadow-2xl outline-none data-[state=closed]:-translate-x-full data-[state=open]:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 flex w-[min(21rem,88vw)] flex-col border-r bg-background shadow-2xl transition-transform duration-180 ease-out outline-none data-[state=closed]:-translate-x-full data-[state=open]:translate-x-0 motion-reduce:transition-none",
           className,
         )}
         {...props}

@@ -4,7 +4,7 @@ Relay is an English-language project management SaaS for small product and creat
 
 ## Current state
 
-Stages 1–10 are implemented: the responsive application shell and workspace-isolated database now include complete authentication, multiple workspace URLs and switching, role-aware member management, secure email invitations, independent project boards, a Realtime Kanban workflow, URL-addressable task details, live comments, private file collaboration, and self-service account settings.
+Stages 1–11 are implemented: the responsive application shell and workspace-isolated database now include complete authentication, multiple workspace URLs and switching, role-aware member management, secure email invitations, independent project boards, a Realtime Kanban workflow, URL-addressable task details, live comments, private file collaboration, self-service account settings, and production-oriented motion, accessibility, loading, and performance safeguards.
 
 ## Requirements
 
@@ -34,7 +34,7 @@ Apply all migrations, seed data, and database verification gates:
 pnpm db:verify
 ```
 
-Supabase Studio is available at [http://127.0.0.1:54323](http://127.0.0.1:54323). See [database architecture](docs/database.md), [authentication setup](docs/authentication.md), [workspace/member operations](docs/workspaces.md), [project/board operations](docs/projects.md), [task/Kanban operations](docs/tasks.md), [comments/attachment operations](docs/collaboration.md), and [account settings](docs/account-settings.md).
+Supabase Studio is available at [http://127.0.0.1:54323](http://127.0.0.1:54323). See [database architecture](docs/database.md), [authentication setup](docs/authentication.md), [workspace/member operations](docs/workspaces.md), [project/board operations](docs/projects.md), [task/Kanban operations](docs/tasks.md), [comments/attachment operations](docs/collaboration.md), [account settings](docs/account-settings.md), and [motion/accessibility/performance checks](docs/quality.md).
 
 ## Quality commands
 
@@ -44,19 +44,23 @@ pnpm lint          # ESLint and architectural boundaries
 pnpm typecheck     # strict TypeScript
 pnpm test          # unit and component tests
 pnpm build         # production build
+pnpm bundle:check  # gzip client-bundle budgets; requires a build
+pnpm performance:check # Lighthouse Performance and Accessibility >= 90
 pnpm test:e2e      # browser auth and responsive tests; requires local Supabase
 pnpm check         # formatting, lint, types, and unit tests
 pnpm db:verify     # reset, lint, RLS tests, and generated-type check
 pnpm db:types      # regenerate TypeScript types after schema changes
 ```
 
-GitHub Actions runs the same quality gates, database security suite, and a separate Playwright job.
+GitHub Actions runs the same quality gates, bundle and Lighthouse budgets, database security suite, and a separate Playwright job with WCAG and browser performance checks.
 
 ## Design system
 
 Relay uses a graphite neutral palette with an indigo accent, Geist typography, Lucide icons, compact radii, and restrained shadows. Light, dark, and system themes are stored through `next-themes`; semantic colors live in `src/app/globals.css` as CSS variables.
 
-Reusable controls and content states live in `src/shared/ui`. The current set includes buttons, inputs, dialogs, dropdown menus, avatars, sheets, skeletons, badges, empty/error states, and Sonner toasts. `components.json` keeps future shadcn-compatible additions aligned with the same aliases and styling conventions.
+Reusable controls and content states live in `src/shared/ui`. The current set includes buttons, inputs, dialogs, dropdown menus, avatars, sheets, skeletons, badges, empty/error states, motion wrappers, and Sonner toasts. `components.json` keeps future shadcn-compatible additions aligned with the same aliases and styling conventions.
+
+Product motion uses a shared 180 ms timing curve, transform/opacity-first animations, and automatic reduced-motion behavior. Workspace routes expose skeleton loading and retryable error states, while the task details panel is loaded as a separate client chunk only when opened.
 
 The application shell adapts at three levels:
 

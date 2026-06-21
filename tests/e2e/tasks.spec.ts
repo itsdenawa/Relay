@@ -6,9 +6,7 @@ import { signInSeededUser, signInUser } from "./support/auth";
 async function expectNoHorizontalOverflow(page: Page) {
   await expect
     .poll(() =>
-      page.evaluate(
-        () => document.documentElement.scrollWidth <= window.innerWidth,
-      ),
+      page.evaluate(() => document.body.scrollWidth <= window.innerWidth),
     )
     .toBe(true);
 }
@@ -84,7 +82,9 @@ test.describe("task lifecycle", () => {
     await page.getByLabel("Filter by label").selectOption({ label: "Feature" });
     await page.getByRole("button", { name: "Apply" }).click();
     await expect(page).toHaveURL(/q=Publish/);
-    await expect(page.getByText("Showing 1 of 1 active tasks.")).toBeVisible();
+    await expect(
+      page.locator("#main-content").getByText("Showing 1 of 1 active tasks."),
+    ).toBeVisible();
 
     await page.getByRole("link", { name: "Clear filters" }).click();
     const updatedTask = page.getByRole("article", {

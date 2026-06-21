@@ -4,7 +4,6 @@ import { useState } from "react";
 import { LoaderCircle } from "lucide-react";
 
 import { getSafeRedirectPath } from "@/shared/lib";
-import { createBrowserSupabaseClient } from "@/shared/api/supabase/browser";
 import { Button } from "@/shared/ui";
 
 type GoogleSignInButtonProps = {
@@ -20,6 +19,8 @@ export function GoogleSignInButton({ next = "/" }: GoogleSignInButtonProps) {
     setError(undefined);
 
     try {
+      const { createBrowserSupabaseClient } =
+        await import("@/shared/api/supabase/browser");
       const supabase = createBrowserSupabaseClient();
       const redirectPath = getSafeRedirectPath(next);
       const callback = new URL("/auth/callback", window.location.origin);

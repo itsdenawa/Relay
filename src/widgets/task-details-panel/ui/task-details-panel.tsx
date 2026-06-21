@@ -30,7 +30,7 @@ import {
   SheetTitle,
 } from "@/shared/ui";
 
-type TaskDetailsPanelProps = {
+export type TaskDetailsPanelProps = {
   context: {
     workspaceId: string;
     workspaceSlug: string;

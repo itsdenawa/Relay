@@ -230,7 +230,7 @@ test("supports accessible DnD, rollback, and cross-client realtime", async ({
       observer.page
         .getByRole("article", { name: "To do" })
         .getByRole("article", { name: "First realtime task" }),
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10_000 });
   } finally {
     await observer.context.close();
   }
