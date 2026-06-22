@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     env:
-      PRODUCTION_URL: ${{ inputs.production_url || github.event.deployment_status.environment_url }}
+      PRODUCTION_URL: ${{ inputs.production_url || vars.PRODUCTION_URL || github.event.deployment_status.environment_url }}
       PRODUCTION_SMOKE_EMAIL: ${{ secrets.PRODUCTION_SMOKE_EMAIL }}
       PRODUCTION_SMOKE_PASSWORD: ${{ secrets.PRODUCTION_SMOKE_PASSWORD }}
     steps:
