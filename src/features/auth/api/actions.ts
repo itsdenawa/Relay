@@ -4,8 +4,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
-import { publicEnvironment } from "@/shared/config/env";
-import { getSafeRedirectPath } from "@/shared/lib";
+import { getSafeRedirectPath, getSafeRequestOrigin } from "@/shared/lib";
 import { createServerSupabaseClient } from "@/shared/api/supabase/server";
 
 import type { AuthActionState } from "../model/action-state";
@@ -55,17 +54,7 @@ function getAuthErrorMessage(code: string | undefined, fallback: string) {
 
 async function getRequestOrigin() {
   const headerStore = await headers();
-  const origin = headerStore.get("origin");
-
-  if (origin) {
-    try {
-      return new URL(origin).origin;
-    } catch {
-      // Fall through to the configured canonical URL.
-    }
-  }
-
-  return new URL(publicEnvironment.NEXT_PUBLIC_SITE_URL).origin;
+  return getSafeRequestOrigin(headerStore.get("origin"));
 }
 
 export async function signInAction(

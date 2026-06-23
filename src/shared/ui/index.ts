@@ -36,6 +36,7 @@ export { Input } from "./input";
 export { Label } from "./label";
 export { MotionItem } from "./motion-item";
 export { NativeSelect } from "./native-select";
+export { PrefetchLink } from "./prefetch-link";
 export { RelayLogo } from "./relay-logo";
 export {
   Sheet,

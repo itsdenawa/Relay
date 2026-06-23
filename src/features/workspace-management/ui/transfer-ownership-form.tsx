@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 
 import type { WorkspaceMember } from "@/entities/workspace";
-import { Button, Label } from "@/shared/ui";
+import { Button, Label, NativeSelect } from "@/shared/ui";
 
 import { transferOwnershipAction } from "../api/actions";
 import { initialWorkspaceActionState } from "../model/action-state";
@@ -41,13 +41,7 @@ export function TransferOwnershipForm({
       <input type="hidden" name="workspaceSlug" value={workspaceSlug} />
       <div className="max-w-md space-y-2">
         <Label htmlFor="new-owner">New Owner</Label>
-        <select
-          id="new-owner"
-          name="userId"
-          defaultValue=""
-          className="h-9 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
-          required
-        >
+        <NativeSelect id="new-owner" name="userId" defaultValue="" required>
           <option value="" disabled>
             Select a member
           </option>
@@ -56,7 +50,7 @@ export function TransferOwnershipForm({
               {member.displayName} ({member.email})
             </option>
           ))}
-        </select>
+        </NativeSelect>
       </div>
       {state.message ? (
         <p role="alert" className="text-sm text-destructive">

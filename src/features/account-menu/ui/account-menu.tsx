@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useTransition } from "react";
 import { LogOut, Settings, UserRound } from "lucide-react";
 
@@ -16,6 +15,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  PrefetchLink,
 } from "@/shared/ui";
 
 type AccountMenuProps = {
@@ -82,16 +82,16 @@ export function AccountMenu({
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href={`/w/${workspaceSlug}/settings/profile`}>
+          <PrefetchLink href={`/w/${workspaceSlug}/settings/profile`}>
             <UserRound />
             Personal settings
-          </Link>
+          </PrefetchLink>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href={`/w/${workspaceSlug}/settings`}>
+          <PrefetchLink href={`/w/${workspaceSlug}/settings`}>
             <Settings />
             Workspace settings
-          </Link>
+          </PrefetchLink>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem

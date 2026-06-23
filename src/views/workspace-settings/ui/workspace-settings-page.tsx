@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { AlertTriangle, Building2, LogOut } from "lucide-react";
 
 import type { CurrentWorkspace } from "@/entities/workspace";
@@ -7,6 +6,7 @@ import {
   leaveWorkspaceAction,
   RenameWorkspaceForm,
 } from "@/features/workspace-management";
+import { SettingsSectionNav } from "@/widgets/settings-navigation";
 import { Badge, Button } from "@/shared/ui";
 
 type WorkspaceSettingsPageProps = {
@@ -37,24 +37,7 @@ export function WorkspaceSettingsPage({
         <p className="mt-2 text-sm text-muted-foreground">
           Manage details and lifecycle for {workspace.name}.
         </p>
-        <nav
-          aria-label="Settings sections"
-          className="mt-5 flex flex-wrap gap-2"
-        >
-          <Button asChild size="sm" variant="outline">
-            <Link href={`/w/${workspace.slug}/settings/profile`}>
-              Personal settings
-            </Link>
-          </Button>
-          <Button asChild size="sm">
-            <Link href={`/w/${workspace.slug}/settings`}>
-              Workspace settings
-            </Link>
-          </Button>
-          <Button asChild size="sm" variant="outline">
-            <Link href={`/w/${workspace.slug}/members`}>Members & roles</Link>
-          </Button>
-        </nav>
+        <SettingsSectionNav workspaceSlug={workspace.slug} />
       </header>
 
       {saved ? (

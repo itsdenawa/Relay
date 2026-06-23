@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { HelpCircle, Settings } from "lucide-react";
 import * as m from "motion/react-m";
@@ -12,7 +11,7 @@ import {
   isNavigationItemActive,
 } from "@/shared/config/navigation";
 import { cn } from "@/shared/lib";
-import { RelayLogo } from "@/shared/ui";
+import { PrefetchLink, RelayLogo } from "@/shared/ui";
 
 type AppSidebarProps = {
   user: { displayName: string; email: string; avatarUrl: string | null };
@@ -79,7 +78,7 @@ export function AppSidebar({ user, workspace, workspaces }: AppSidebarProps) {
               {content}
             </span>
           ) : (
-            <Link
+            <PrefetchLink
               key={label}
               href={href}
               aria-current={active ? "page" : undefined}
@@ -87,7 +86,7 @@ export function AppSidebar({ user, workspace, workspaces }: AppSidebarProps) {
               className={className}
             >
               {content}
-            </Link>
+            </PrefetchLink>
           );
         })}
       </nav>
@@ -101,14 +100,14 @@ export function AppSidebar({ user, workspace, workspaces }: AppSidebarProps) {
           <HelpCircle className="size-[1.1rem]" />
           <span className="hidden xl:inline">Help & support</span>
         </span>
-        <Link
+        <PrefetchLink
           href={`/w/${workspace.slug}/settings`}
           title="Settings"
           className="flex h-10 items-center justify-center gap-3 rounded-lg px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent/70 hover:text-sidebar-foreground xl:justify-start"
         >
           <Settings className="size-[1.1rem]" />
           <span className="hidden xl:inline">Settings</span>
-        </Link>
+        </PrefetchLink>
         <div className="hidden pt-1 xl:block">
           <AccountMenu showDetails {...user} workspaceSlug={workspace.slug} />
         </div>

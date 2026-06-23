@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, Settings } from "lucide-react";
 
@@ -14,6 +13,7 @@ import {
 import { cn } from "@/shared/lib";
 import {
   Button,
+  PrefetchLink,
   RelayLogo,
   Sheet,
   SheetClose,
@@ -99,13 +99,13 @@ export function MobileNavigationTrigger({
               </span>
             ) : (
               <SheetClose key={label} asChild>
-                <Link
+                <PrefetchLink
                   href={href}
                   aria-current={active ? "page" : undefined}
                   className={className}
                 >
                   {content}
-                </Link>
+                </PrefetchLink>
               </SheetClose>
             );
           })}
@@ -113,13 +113,13 @@ export function MobileNavigationTrigger({
 
         <div className="space-y-1 border-t p-3">
           <SheetClose asChild>
-            <Link
+            <PrefetchLink
               href={`/w/${workspace.slug}/settings`}
               className="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
             >
               <Settings className="size-[1.1rem]" />
               Settings
-            </Link>
+            </PrefetchLink>
           </SheetClose>
           <ThemeSwitcher showLabel />
           <AccountMenu showDetails {...user} workspaceSlug={workspace.slug} />
@@ -166,14 +166,14 @@ export function MobileBottomNavigation({
             {content}
           </span>
         ) : (
-          <Link
+          <PrefetchLink
             key={label}
             href={href}
             aria-current={active ? "page" : undefined}
             className={className}
           >
             {content}
-          </Link>
+          </PrefetchLink>
         );
       })}
     </nav>

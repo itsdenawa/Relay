@@ -1,19 +1,18 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { createServerSupabaseClient } from "@/shared/api/supabase/server";
-import { publicEnvironment } from "@/shared/config/env";
-import { getSafeRedirectPath } from "@/shared/lib";
+import { getSafeRedirectPath, getSafeRequestOrigin } from "@/shared/lib";
 
 function getRedirectOrigin(request: NextRequest) {
   if (process.env.NODE_ENV === "development") {
     const host = request.headers.get("host");
 
     if (host) {
-      return `${request.nextUrl.protocol}//${host}`;
+      return getSafeRequestOrigin(`${request.nextUrl.protocol}//${host}`);
     }
   }
 
-  return new URL(publicEnvironment.NEXT_PUBLIC_SITE_URL).origin;
+  return getSafeRequestOrigin(request.nextUrl.origin);
 }
 
 export async function GET(request: NextRequest) {
