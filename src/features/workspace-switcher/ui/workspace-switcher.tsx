@@ -1,7 +1,6 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import Link from "next/link";
 import { Building2, Check, ChevronsUpDown, Plus } from "lucide-react";
 
 import {
@@ -23,6 +22,7 @@ import {
   DropdownMenuTrigger,
   Input,
   Label,
+  PrefetchLink,
 } from "@/shared/ui";
 
 type WorkspaceSwitcherProps = {
@@ -82,7 +82,7 @@ export function WorkspaceSwitcher({
           <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
           {workspaces.map((workspace) => (
             <DropdownMenuItem key={workspace.slug} asChild>
-              <Link href={`/w/${workspace.slug}`}>
+              <PrefetchLink href={`/w/${workspace.slug}`}>
                 <Building2 />
                 <span className="min-w-0 flex-1 truncate">
                   {workspace.name}
@@ -90,7 +90,7 @@ export function WorkspaceSwitcher({
                 {workspace.slug === currentWorkspace.slug ? (
                   <Check className="ml-auto" />
                 ) : null}
-              </Link>
+              </PrefetchLink>
             </DropdownMenuItem>
           ))}
           <DropdownMenuSeparator />

@@ -23,7 +23,14 @@ import {
   TransferOwnershipForm,
   updateMemberRoleAction,
 } from "@/features/workspace-management";
-import { Avatar, AvatarFallback, Badge, Button, EmptyState } from "@/shared/ui";
+import {
+  Avatar,
+  AvatarFallback,
+  Badge,
+  Button,
+  EmptyState,
+  NativeSelect,
+} from "@/shared/ui";
 
 type WorkspaceMembersPageProps = {
   workspace: CurrentWorkspace;
@@ -144,7 +151,7 @@ export function WorkspaceMembersPage({
                   <div className="flex items-center gap-2">
                     <form
                       action={updateMemberRoleAction}
-                      className="flex gap-2"
+                      className="flex min-w-0 gap-2"
                     >
                       <input
                         type="hidden"
@@ -157,15 +164,16 @@ export function WorkspaceMembersPage({
                         value={workspace.slug}
                       />
                       <input type="hidden" name="userId" value={member.id} />
-                      <select
+                      <NativeSelect
                         name="role"
                         defaultValue={member.role}
                         aria-label={`Role for ${member.displayName}`}
-                        className="h-8 rounded-md border border-input bg-background px-2 text-xs outline-none focus-visible:ring-2 focus-visible:ring-ring/20"
+                        className="h-8 w-32 rounded-md text-xs"
+                        iconClassName="right-2.5 size-3.5"
                       >
                         <option value="member">Member</option>
                         <option value="admin">Admin</option>
-                      </select>
+                      </NativeSelect>
                       <Button type="submit" size="sm" variant="outline">
                         Update
                       </Button>

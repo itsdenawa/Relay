@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 
-import { Button, Input, Label } from "@/shared/ui";
+import { Button, Input, Label, NativeSelect } from "@/shared/ui";
 
 import { inviteMemberAction } from "../api/actions";
 import { initialInvitationActionState } from "../model/action-state";
@@ -44,15 +44,14 @@ export function InviteMemberForm({
         </div>
         <div className="space-y-2">
           <Label htmlFor="invite-role">Role</Label>
-          <select
+          <NativeSelect
             id="invite-role"
             name="role"
             defaultValue={state.values?.role || "member"}
-            className="h-9 w-full rounded-lg border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/20"
           >
             <option value="member">Member</option>
             <option value="admin">Admin</option>
-          </select>
+          </NativeSelect>
         </div>
         <Button type="submit" disabled={pending}>
           {pending ? "Sending…" : "Send invite"}

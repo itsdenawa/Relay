@@ -1,6 +1,7 @@
 import { AppHeader } from "./app-header";
 import { AppSidebar } from "./app-sidebar";
 import { MobileBottomNavigation } from "./mobile-navigation";
+import { RoutePrefetcher } from "./route-prefetcher";
 
 type AppShellProps = Readonly<{
   children: React.ReactNode;
@@ -29,6 +30,7 @@ export function AppShell({
         </main>
       </div>
       <MobileBottomNavigation workspaceSlug={workspace.slug} />
+      <RoutePrefetcher workspaceSlug={workspace.slug} />
     </div>
   );
 }
