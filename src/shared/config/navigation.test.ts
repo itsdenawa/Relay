@@ -10,6 +10,15 @@ describe("workspace navigation", () => {
 
   if (!projects || !overview) throw new Error("Expected navigation items");
 
+  it("only exposes finished MVP routes", () => {
+    expect(navigation.map((item) => item.label)).toEqual([
+      "Overview",
+      "Projects",
+      "Members",
+    ]);
+    expect(navigation.every((item) => !item.disabled)).toBe(true);
+  });
+
   it("keeps Projects active on list and board URLs", () => {
     expect(projects).toBeDefined();
     expect(

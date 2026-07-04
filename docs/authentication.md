@@ -9,6 +9,7 @@ Relay uses Supabase Auth with PKCE and cookie-backed SSR sessions. The browser a
 - `/forgot-password` — requests a recovery email without exposing whether an account exists.
 - `/reset-password` — accepts a recovery session and updates the password.
 - `/auth/callback` — exchanges PKCE codes and only accepts relative `next` paths.
+- `/` — public landing for anonymous visitors; authenticated users are routed to their workspace or onboarding.
 - `/onboarding` — updates the generated profile and atomically creates the first workspace and Owner membership.
 
 ## Local email flow

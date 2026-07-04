@@ -1,4 +1,4 @@
-import { ArrowUpRight, CheckCircle2 } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, MessageSquareText } from "lucide-react";
 
 import { ThemeSwitcher } from "@/features/theme-switcher";
 import { RelayLogo } from "@/shared/ui";
@@ -28,8 +28,12 @@ export function AuthShell({
     <main
       id="main-content"
       tabIndex={-1}
-      className="grid min-h-dvh outline-none lg:grid-cols-[minmax(0,1fr)_minmax(30rem,0.82fr)]"
+      className="relative isolate grid min-h-dvh overflow-hidden bg-background outline-none lg:grid-cols-[minmax(0,1fr)_minmax(30rem,0.82fr)]"
     >
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[34rem] bg-[radial-gradient(circle_at_65%_0%,color-mix(in_oklch,var(--primary)_14%,transparent),transparent_62%)]"
+      />
       <section className="relative hidden overflow-hidden border-r bg-sidebar p-10 lg:flex lg:flex-col xl:p-14">
         <div
           aria-hidden="true"
@@ -54,6 +58,17 @@ export function AuthShell({
               </li>
             ))}
           </ul>
+
+          <div className="mt-10 rounded-3xl border bg-background/80 p-4 shadow-sm backdrop-blur">
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <MessageSquareText className="size-4 text-primary" />
+              Launch handoff
+            </div>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+              “The board is ready, files are attached, and the owner handoff is
+              visible to everyone.”
+            </p>
+          </div>
         </div>
 
         <p className="relative flex items-center gap-2 text-xs text-muted-foreground">

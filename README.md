@@ -4,7 +4,7 @@ Relay is an English-language project management SaaS for small product and creat
 
 ## Current state
 
-Stages 1–12 are implemented. Relay now includes the complete workspace-isolated product, production hardening, monitoring hooks, analytics, encrypted backups, isolated preview data, release automation, and production smoke coverage.
+Stages 1–12 are implemented, with an additional launch polish stage in progress. Relay now includes the complete workspace-isolated product, a public landing page, production hardening, monitoring hooks, analytics, encrypted backups, isolated preview data, release automation, and production smoke coverage.
 
 Production: [relay-vert-seven.vercel.app](https://relay-vert-seven.vercel.app)
 
@@ -26,7 +26,7 @@ pnpm db:start
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000). Anonymous visitors see the public Relay landing page. Signed-in users are routed to their active workspace, or to onboarding when they do not have one yet.
 
 The Supabase command requires Docker and prints the local URL and development keys. The unused Edge Runtime container is excluded; Auth, REST, Realtime, Storage, and Studio remain available. Confirmation, recovery, and workspace invitation emails are captured by Mailpit at [http://127.0.0.1:54324](http://127.0.0.1:54324). Production invitations switch to Resend when its server-only API key and verified sender are configured. Production account deletion requires the server-only Supabase secret key; local development discovers the temporary key from the running CLI stack.
 
@@ -59,7 +59,7 @@ GitHub Actions runs the same quality gates, bundle and Lighthouse budgets, datab
 
 ## Design system
 
-Relay uses a graphite neutral palette with an indigo accent, Geist typography, Lucide icons, compact radii, and restrained shadows. Light, dark, and system themes are stored through `next-themes`; semantic colors live in `src/app/globals.css` as CSS variables.
+Relay uses a graphite neutral palette with an indigo accent, Geist typography, Lucide icons, compact radii, and restrained shadows. Light, dark, and system themes are stored through `next-themes`; semantic colors live in `src/app/globals.css` as CSS variables. The public landing page and authenticated product shell share the same visual language so the first-touch, auth, onboarding, and dashboard flows feel continuous.
 
 Reusable controls and content states live in `src/shared/ui`. The current set includes buttons, inputs, dialogs, dropdown menus, avatars, sheets, skeletons, badges, empty/error states, motion wrappers, and Sonner toasts. `components.json` keeps future shadcn-compatible additions aligned with the same aliases and styling conventions.
 
@@ -71,7 +71,7 @@ The application shell adapts at three levels:
 - Tablet: compact icon navigation with the same content hierarchy.
 - Mobile: touch-friendly header, navigation drawer, and fixed quick navigation.
 
-The dashboard reports live project and task totals. Project boards support mouse, touch, and keyboard drag and drop, with an explicit move menu available as a fallback. Moves appear optimistically, roll back on failure, and reconcile with the server through Supabase Realtime.
+The public landing page explains Relay with a static product preview and clear sign-in/signup actions. The authenticated dashboard reports live project and task totals, highlights workspace momentum, and links directly into project boards. Project boards support mouse, touch, and keyboard drag and drop, with an explicit move menu available as a fallback. Moves appear optimistically, roll back on failure, and reconcile with the server through Supabase Realtime.
 
 Task titles open a responsive details panel whose `task` query parameter preserves direct links and active board filters. The panel provides Realtime comments and private attachments with progress-aware uploads and short-lived signed downloads.
 

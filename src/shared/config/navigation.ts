@@ -1,5 +1,4 @@
 import {
-  BarChart3,
   FolderKanban,
   LayoutDashboard,
   UsersRound,
@@ -46,12 +45,6 @@ export function getPrimaryNavigation(workspaceSlug: string): NavigationItem[] {
       label: "Members",
       href: `${workspacePath}/members`,
       icon: UsersRound,
-    },
-    {
-      label: "Reports",
-      href: `${workspacePath}/reports`,
-      icon: BarChart3,
-      disabled: true,
     },
   ];
 }

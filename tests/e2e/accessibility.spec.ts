@@ -34,6 +34,9 @@ test("has no critical WCAG A or AA violations on key flows", async ({
   test.slow();
   const projectKey = `A${testInfo.workerIndex}${testInfo.retry}Y`;
 
+  await page.goto("/");
+  await expectNoAccessibilityViolations(page, "Landing");
+
   await page.goto("/login");
   await expectNoAccessibilityViolations(page, "Sign in");
 
