@@ -174,6 +174,7 @@ test("supports accessible DnD, rollback, and cross-client realtime", async ({
   await expect(firstHandle).toHaveAttribute("aria-pressed", "true");
   await page.keyboard.press("ArrowRight");
   await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("ArrowRight");
   await expect(
     page.getByRole("status").filter({ hasText: "is over In progress column" }),
   ).toBeVisible();

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, FolderKanban, Search, X } from "lucide-react";
+import { ArrowLeft, FolderKanban } from "lucide-react";
 
 import type { TaskAttachment } from "@/entities/attachment";
 import type { TaskComment } from "@/entities/comment";
@@ -17,9 +17,11 @@ import {
   TaskFormDialog,
 } from "@/features/task-management";
 import { cn } from "@/shared/lib";
-import { Badge, Button, Input, NativeSelect } from "@/shared/ui";
+import { Badge, Button } from "@/shared/ui";
 import { ArchivedTaskList, KanbanBoard } from "@/widgets/kanban-board";
 import { TaskDetailsPanel } from "@/widgets/task-details-panel";
+
+import { BoardFilters } from "./board-filters";
 
 type ProjectBoardPageProps = {
   workspace: CurrentWorkspace;
@@ -37,15 +39,6 @@ type ProjectBoardPageProps = {
   initialComments: TaskComment[];
   initialAttachments: TaskAttachment[];
 };
-
-const priorities = [
-  { value: "", label: "All priorities" },
-  { value: "no_priority", label: "No priority" },
-  { value: "low", label: "Low" },
-  { value: "medium", label: "Medium" },
-  { value: "high", label: "High" },
-  { value: "urgent", label: "Urgent" },
-];
 
 export function ProjectBoardPage({
   workspace,
@@ -77,9 +70,6 @@ export function ProjectBoardPage({
     projectId: project.id,
   };
   const boardUrl = `/w/${workspace.slug}/p/${project.id}/board`;
-  const hasFilters = Boolean(
-    filters.query || filters.assigneeId || filters.priority || filters.labelId,
-  );
 
   return (
     <div className="mx-auto w-full max-w-[1800px]">
@@ -195,77 +185,14 @@ export function ProjectBoardPage({
 
       {!showArchived ? (
         <>
-          <form
-            key={`${filters.query ?? ""}|${filters.assigneeId ?? ""}|${filters.priority ?? ""}|${filters.labelId ?? ""}`}
-            method="get"
-            className="mt-4 grid gap-2 rounded-xl border bg-card p-3 sm:grid-cols-2 xl:grid-cols-[minmax(12rem,1fr)_12rem_10rem_11rem_auto]"
-          >
-            <div className="relative">
-              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                name="q"
-                defaultValue={filters.query}
-                placeholder="Search tasks"
-                aria-label="Search tasks"
-                className="pl-9"
-              />
-            </div>
-            <NativeSelect
-              name="assignee"
-              defaultValue={filters.assigneeId ?? ""}
-              aria-label="Filter by assignee"
-            >
-              <option value="">All assignees</option>
-              <option value="unassigned">Unassigned</option>
-              {members.map((member) => (
-                <option key={member.id} value={member.id}>
-                  {member.displayName}
-                </option>
-              ))}
-            </NativeSelect>
-            <NativeSelect
-              name="priority"
-              defaultValue={filters.priority ?? ""}
-              aria-label="Filter by priority"
-            >
-              {priorities.map((priority) => (
-                <option key={priority.value} value={priority.value}>
-                  {priority.label}
-                </option>
-              ))}
-            </NativeSelect>
-            <NativeSelect
-              name="label"
-              defaultValue={filters.labelId ?? ""}
-              aria-label="Filter by label"
-            >
-              <option value="">All labels</option>
-              {labels.map((label) => (
-                <option key={label.id} value={label.id}>
-                  {label.name}
-                </option>
-              ))}
-            </NativeSelect>
-            <div className="flex gap-2">
-              <Button type="submit" variant="secondary" className="flex-1">
-                Apply
-              </Button>
-              {hasFilters ? (
-                <Button asChild type="button" variant="ghost" size="icon">
-                  <Link href={boardUrl} aria-label="Clear filters">
-                    <X />
-                  </Link>
-                </Button>
-              ) : null}
-            </div>
-          </form>
-
-          {hasFilters ? (
-            <p className="mt-3 text-xs text-muted-foreground" role="status">
-              Showing {visibleTasks.length} of {activeTasks.length} active
-              tasks.
-            </p>
-          ) : null}
+          <BoardFilters
+            boardUrl={boardUrl}
+            filters={filters}
+            labels={labels}
+            members={members}
+            activeTaskCount={activeTasks.length}
+            visibleTaskCount={visibleTasks.length}
+          />
 
           <div className="mt-4">
             <KanbanBoard
