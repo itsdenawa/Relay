@@ -31,6 +31,7 @@ import {
   CalendarDays,
   CircleDashed,
   GripVertical,
+  Plus,
   RotateCcw,
 } from "lucide-react";
 
@@ -101,6 +102,18 @@ function formatDueDate(date: string) {
   }).format(new Date(`${date}T12:00:00`));
 }
 
+function getDueDateState(date: string | null) {
+  if (!date) return "none";
+  const dueAt = new Date(`${date}T23:59:59`);
+  const now = new Date();
+  const soon = new Date(now);
+  soon.setDate(soon.getDate() + 3);
+
+  if (dueAt < now) return "overdue";
+  if (dueAt <= soon) return "soon";
+  return "normal";
+}
+
 function TaskCard({
   context,
   task,
@@ -144,8 +157,7 @@ function TaskCard({
   });
   const taskLabels = labels.filter((label) => task.labelIds.includes(label.id));
   const assignee = members.find((member) => member.id === task.assignee_id);
-  const overdue =
-    task.due_date && new Date(`${task.due_date}T23:59:59`) < new Date();
+  const dueDateState = getDueDateState(task.due_date);
 
   return (
     <article
@@ -157,7 +169,7 @@ function TaskCard({
       aria-label={task.title}
       data-testid={`task-${task.id}`}
       className={cn(
-        "rounded-xl border bg-card p-3 shadow-xs transition-[border-color,box-shadow]",
+        "group/task rounded-xl border bg-card p-3 shadow-xs transition-[background-color,border-color,box-shadow,transform] focus-within:border-primary/25 hover:-translate-y-0.5 hover:border-primary/25 hover:bg-card/95 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0",
         highlighted && "border-primary/50 ring-2 ring-primary/10",
         isDragging && "opacity-30",
         moving && "animate-pulse motion-reduce:animate-none",
@@ -211,11 +223,11 @@ function TaskCard({
         </p>
       ) : null}
 
-      <div className="mt-3 flex flex-wrap items-center gap-2">
+      <div className="mt-3 flex flex-wrap items-center gap-2 border-t pt-2.5">
         {task.priority !== "no_priority" ? (
           <span
             className={cn(
-              "inline-flex items-center gap-1 text-[11px] font-medium",
+              "inline-flex items-center gap-1 rounded-full bg-muted/70 px-1.5 py-0.5 text-[11px] font-medium",
               priorityTones[task.priority],
             )}
           >
@@ -226,8 +238,10 @@ function TaskCard({
         {task.due_date ? (
           <span
             className={cn(
-              "inline-flex items-center gap-1 text-[11px] text-muted-foreground",
-              overdue && "font-medium text-destructive",
+              "inline-flex items-center gap-1 rounded-full bg-muted/70 px-1.5 py-0.5 text-[11px] text-muted-foreground",
+              dueDateState === "overdue" && "font-medium text-destructive",
+              dueDateState === "soon" &&
+                "font-medium text-amber-700 dark:text-amber-400",
             )}
           >
             <CalendarDays className="size-3" />
@@ -247,7 +261,7 @@ function TaskCard({
       </div>
 
       {!readOnly ? (
-        <div className="mt-3 flex items-center gap-1 border-t pt-2.5">
+        <div className="mt-2 flex items-center gap-1 opacity-100 transition-[opacity,transform] motion-reduce:transition-none sm:translate-x-1 sm:opacity-0 sm:group-focus-within/task:translate-x-0 sm:group-focus-within/task:opacity-100 sm:group-hover/task:translate-x-0 sm:group-hover/task:opacity-100">
           <TaskFormDialog
             context={context}
             columns={columns}
@@ -303,6 +317,8 @@ function KanbanColumn({
   readOnly,
   highlightedTaskId,
   movingTaskId,
+  boardEmpty,
+  dragging,
   reducedMotion,
   detailsHrefFor,
 }: {
@@ -315,6 +331,8 @@ function KanbanColumn({
   readOnly: boolean;
   highlightedTaskId?: string | undefined;
   movingTaskId?: string | undefined;
+  boardEmpty: boolean;
+  dragging: boolean;
   reducedMotion: boolean;
   detailsHrefFor: (taskId: string) => string;
 }) {
@@ -330,15 +348,17 @@ function KanbanColumn({
       aria-label={column.name}
       data-testid={`column-${column.id}`}
       className={cn(
-        "min-h-[30rem] rounded-2xl border bg-muted/35 p-3 transition-[border-color,background-color,box-shadow]",
+        "min-h-[26rem] rounded-2xl border bg-muted/30 p-3 transition-[border-color,background-color,box-shadow]",
         isOver && "border-primary/40 bg-primary/5 ring-2 ring-primary/10",
       )}
     >
       <header className="flex items-center justify-between gap-3 px-1 py-1">
-        <h2 className="text-sm font-semibold">{column.name}</h2>
-        <span className="rounded-full bg-background px-2 py-0.5 text-xs text-muted-foreground shadow-xs">
-          {tasks.length}
-        </span>
+        <div className="flex min-w-0 items-center gap-2">
+          <h2 className="truncate text-sm font-semibold">{column.name}</h2>
+          <span className="rounded-full bg-background px-2 py-0.5 text-xs text-muted-foreground shadow-xs">
+            {tasks.length}
+          </span>
+        </div>
       </header>
       <SortableContext
         items={tasks.map((task) => task.id)}
@@ -360,12 +380,17 @@ function KanbanColumn({
               detailsHref={detailsHrefFor(task.id)}
             />
           ))}
-          {!tasks.length ? (
-            <div className="flex min-h-24 flex-col items-center justify-center rounded-xl border border-dashed bg-background/60 px-4 text-center">
+          {!tasks.length && !boardEmpty && dragging ? (
+            <div className="flex min-h-24 flex-col items-center justify-center rounded-xl border border-dashed border-primary/35 bg-primary/5 px-4 text-center">
               <CircleDashed className="size-4 text-muted-foreground/60" />
               <p className="mt-2 text-xs text-muted-foreground">
-                Drop a task here or create one.
+                Drop task here.
               </p>
+            </div>
+          ) : null}
+          {!tasks.length && !boardEmpty && !dragging ? (
+            <div className="min-h-6 px-1 text-xs text-muted-foreground/70">
+              No tasks here yet.
             </div>
           ) : null}
           {!readOnly ? (
@@ -378,7 +403,7 @@ function KanbanColumn({
               buttonLabel="Add task"
               buttonVariant="ghost"
               buttonSize="sm"
-              className="w-full text-muted-foreground"
+              className="w-full justify-start text-muted-foreground"
             />
           ) : null}
         </div>
@@ -444,6 +469,7 @@ export function KanbanBoard({
     [activeTasks, filters],
   );
   const activeTask = activeTasks.find((task) => task.id === activeTaskId);
+  const boardEmpty = activeTasks.length === 0;
   const accessibility = useMemo(() => {
     const taskTitle = (id: string | number) =>
       activeTasks.find((task) => task.id === String(id))?.title ?? "task";
@@ -583,7 +609,35 @@ export function KanbanBoard({
         onDragEnd={handleDragEnd}
       >
         <div className="overflow-x-auto pb-4">
-          <div className="grid min-w-max auto-cols-[18rem] grid-flow-col gap-3 xl:min-w-0 xl:grid-flow-row xl:grid-cols-5">
+          {boardEmpty && !readOnly ? (
+            <div className="mb-3 rounded-2xl border bg-card p-5 shadow-xs">
+              <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+                <div className="flex items-start gap-3">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
+                    <Plus className="size-5" />
+                  </span>
+                  <div>
+                    <h2 className="font-semibold">Start building your board</h2>
+                    <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
+                      Create the first task. Columns stay visible, but the board
+                      keeps the empty state in one calm place.
+                    </p>
+                  </div>
+                </div>
+                <TaskFormDialog
+                  context={context}
+                  columns={columns}
+                  labels={labels}
+                  members={members}
+                  defaultColumnId={columns[0]?.id}
+                  buttonLabel="Create task"
+                  buttonSize="sm"
+                  className="shrink-0"
+                />
+              </div>
+            </div>
+          ) : null}
+          <div className="grid min-w-max auto-cols-[18.5rem] grid-flow-col gap-3 2xl:min-w-0 2xl:grid-flow-row 2xl:grid-cols-5">
             {columns.map((column) => (
               <KanbanColumn
                 key={column.id}
@@ -598,6 +652,8 @@ export function KanbanBoard({
                 readOnly={readOnly}
                 highlightedTaskId={highlightedTaskId}
                 movingTaskId={movingTaskId}
+                boardEmpty={boardEmpty}
+                dragging={Boolean(activeTaskId)}
                 reducedMotion={reducedMotion}
                 detailsHrefFor={detailsHrefFor}
               />
@@ -608,7 +664,7 @@ export function KanbanBoard({
           {activeTask ? (
             <div
               data-testid="task-drag-overlay"
-              className="w-64 rounded-xl border border-primary/30 bg-card p-3 text-sm font-medium shadow-xl"
+              className="w-72 rotate-1 rounded-xl border border-primary/30 bg-card p-3 text-sm font-medium shadow-xl"
             >
               {activeTask.title}
             </div>

@@ -78,15 +78,17 @@ test.describe("task lifecycle", () => {
     ).toBeVisible();
 
     await page.getByLabel("Search tasks").fill("Publish");
-    await page.getByLabel("Filter by priority").selectOption("urgent");
-    await page.getByLabel("Filter by label").selectOption({ label: "Feature" });
-    await page.getByRole("button", { name: "Apply" }).click();
+    await page.getByLabel("Search tasks").press("Enter");
     await expect(page).toHaveURL(/q=Publish/);
+    await page.getByLabel("Filter by priority").selectOption("urgent");
+    await expect(page).toHaveURL(/priority=urgent/);
+    await page.getByLabel("Filter by label").selectOption({ label: "Feature" });
+    await expect(page).toHaveURL(/label=/);
     await expect(
-      page.locator("#main-content").getByText("Showing 1 of 1 active tasks."),
+      page.locator("#main-content").getByText("Showing 1 of 1 active tasks"),
     ).toBeVisible();
 
-    await page.getByRole("link", { name: "Clear filters" }).click();
+    await page.getByRole("link", { name: "Clear all" }).click();
     const updatedTask = page.getByRole("article", {
       name: "Publish launch brief",
     });
