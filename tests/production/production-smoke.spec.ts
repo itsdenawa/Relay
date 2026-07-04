@@ -12,20 +12,22 @@ test("serves a healthy, hardened, accessible public application", async ({
     checks: { supabase: "ok" },
   });
 
-  const loginResponse = await page.goto("/login");
-  expect(loginResponse).not.toBeNull();
-  expect(loginResponse?.headers()["content-security-policy"]).toContain(
+  const landingResponse = await page.goto("/");
+  expect(landingResponse).not.toBeNull();
+  expect(landingResponse?.headers()["content-security-policy"]).toContain(
     "frame-ancestors 'none'",
   );
-  expect(loginResponse?.headers()["x-content-type-options"]).toBe("nosniff");
-  expect(loginResponse?.headers()["x-frame-options"]).toBe("DENY");
+  expect(landingResponse?.headers()["x-content-type-options"]).toBe("nosniff");
+  expect(landingResponse?.headers()["x-frame-options"]).toBe("DENY");
   if (process.env.PRODUCTION_URL?.startsWith("https://")) {
-    expect(loginResponse?.headers()["strict-transport-security"]).toContain(
+    expect(landingResponse?.headers()["strict-transport-security"]).toContain(
       "max-age=63072000",
     );
   }
   await expect(
-    page.getByRole("heading", { name: "Sign in to Relay" }),
+    page.getByRole("heading", {
+      name: "A calmer command center for focused teams.",
+    }),
   ).toBeVisible();
 
   const accessibility = await new AxeBuilder({ page })
@@ -34,6 +36,7 @@ test("serves a healthy, hardened, accessible public application", async ({
   expect(accessibility.violations).toEqual([]);
 
   await page.setViewportSize({ width: 320, height: 780 });
+  await page.goto("/");
   await expect
     .poll(() =>
       page.evaluate(

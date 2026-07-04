@@ -19,16 +19,39 @@ const protectedPrefixes = [
 ];
 
 function isProtectedPath(pathname: string) {
-  return (
-    pathname === "/" ||
-    protectedPrefixes.some(
-      (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
-    )
+  return protectedPrefixes.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+}
+
+function hasSupabaseAuthCookie(cookies: Array<{ name: string }>) {
+  return cookies.some(
+    (cookie) =>
+      cookie.name.startsWith("sb-") && cookie.name.includes("auth-token"),
   );
 }
 
 export async function updateSupabaseSession(request: NextRequest) {
   let response = NextResponse.next({ request });
+  const pathname = request.nextUrl.pathname;
+  const hasAuthCookie = hasSupabaseAuthCookie(request.cookies.getAll());
+
+  if (!hasAuthCookie) {
+    if (isProtectedPath(pathname)) {
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/login";
+      loginUrl.search = "";
+      loginUrl.searchParams.set(
+        "next",
+        getSafeRedirectPath(`${pathname}${request.nextUrl.search}`),
+      );
+
+      return NextResponse.redirect(loginUrl);
+    }
+
+    return response;
+  }
+
   const { url, publishableKey } = getSupabasePublicConfig();
 
   const supabase = createServerClient<Database>(url, publishableKey, {
@@ -52,7 +75,6 @@ export async function updateSupabaseSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const pathname = request.nextUrl.pathname;
   const isAuthenticated = Boolean(user);
 
   if (!isAuthenticated && isProtectedPath(pathname)) {

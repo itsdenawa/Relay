@@ -28,6 +28,27 @@ test("renders the responsive dashboard shell", async ({ page }) => {
   await expectNoHorizontalOverflow(page);
 });
 
+test("renders the public landing page for anonymous visitors", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  await expect(page).toHaveURL("/");
+  await expect(
+    page.getByRole("heading", {
+      name: "A calmer command center for focused teams.",
+    }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Relay product preview")).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Create your workspace/ }),
+  ).toHaveAttribute("href", "/signup");
+  await expect(
+    page.getByRole("link", { name: "Sign in" }).first(),
+  ).toHaveAttribute("href", "/login");
+  await expectNoHorizontalOverflow(page);
+});
+
 for (const destination of [
   { label: "Projects", path: "projects", heading: "Projects" },
   { label: "Members", path: "members", heading: "Members" },
@@ -123,11 +144,11 @@ test("opens the navigation drawer on mobile", async ({ page }) => {
   await expectNoHorizontalOverflow(page);
 });
 
-test("redirects anonymous users to sign in", async ({ page }) => {
+test("redirects authenticated root visits to the current workspace", async ({
+  page,
+}) => {
+  await signInSeededUser(page);
   await page.goto("/");
 
-  await expect(page).toHaveURL(/\/login\?next=%2F$/);
-  await expect(
-    page.getByRole("heading", { name: "Sign in to Relay" }),
-  ).toBeVisible();
+  await expect(page).toHaveURL(`/w/${seededUser.workspaceSlug}`);
 });

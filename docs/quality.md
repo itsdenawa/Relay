@@ -35,6 +35,6 @@ pnpm bundle:check
 pnpm performance:check
 ```
 
-`bundle:check` enforces gzip budgets for the initial client runtime (220 kB), the largest individual chunk (180 kB), and all emitted client chunks (900 kB). Lighthouse CI audits `/login` and `/signup` and requires both Performance and Accessibility scores of at least 90. Authenticated routes are covered by Playwright WCAG and browser performance regression checks.
+`bundle:check` enforces gzip budgets for the initial client runtime (220 kB), the largest individual chunk (180 kB), and all emitted client chunks (900 kB). Lighthouse CI audits `/`, `/login`, and `/signup` and requires both Performance and Accessibility scores of at least 90. Authenticated routes are covered by Playwright WCAG and browser performance regression checks.
 
 The browser suite also keeps first contentful paint below 2.5 seconds and time to first byte below 800 ms in the local test environment. Production monitoring receives metrics through Next.js `useReportWebVitals` as `relay:web-vital` browser events, ready for the stage 12 analytics sink.

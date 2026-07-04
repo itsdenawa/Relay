@@ -5,7 +5,7 @@
 - [ ] Pull request CI is green: format, lint, types, unit/component, production build, bundle, Lighthouse, database/RLS, and E2E.
 - [ ] Database migration dry run contains only reviewed changes.
 - [ ] Supabase Security Advisor has no unresolved production findings.
-- [ ] Preview passes desktop, tablet, 320 px mobile, keyboard, and reduced-motion review.
+- [ ] Preview passes public landing, auth, onboarding, dashboard, settings, desktop, tablet, 320 px mobile, keyboard, and reduced-motion review.
 - [ ] Loading, failed mutation rollback, cancelled upload, and realtime reconnect behavior are verified.
 - [ ] A current backup exists and the rollback owner is identified.
 
@@ -21,7 +21,7 @@
 ## After deployment
 
 - [ ] `/api/health` reports application and Supabase status `ok`.
-- [ ] Production smoke workflow passes, including security headers and public accessibility.
+- [ ] Production smoke workflow passes, including public landing, security headers, and accessibility.
 - [ ] Smoke account can sign in and load its workspace without writes.
 - [ ] Signup confirmation, password recovery, invitation, Realtime, upload, and secure download receive a manual spot check.
 - [ ] Error rate, Core Web Vitals, Auth logs, and database load remain healthy during the observation window.

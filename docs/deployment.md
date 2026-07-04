@@ -38,7 +38,7 @@ Connect the final domain, redeploy after environment changes, and verify `/api/h
 
 Use Supabase Branching with the GitHub integration for isolated preview databases and preview environment variables. If Branching is unavailable, use one dedicated staging project with disposable data. Never expose production secrets to pull-request deployments from forks.
 
-Each preview must pass the public login smoke, mobile reflow, and accessibility checks. Stateful collaboration E2E continues to run against the disposable local Supabase stack in CI.
+Each preview must pass the public landing and login smoke, mobile reflow, and accessibility checks. Stateful collaboration E2E continues to run against the disposable local Supabase stack in CI.
 
 ## 4. Monitoring and backups
 
@@ -49,6 +49,6 @@ Each preview must pass the public login smoke, mobile reflow, and accessibility 
 
 ## 5. Release and rollback
 
-Run `pnpm release:check`, deploy the database migration, deploy Vercel, and then run `pnpm test:smoke:production` with `PRODUCTION_URL`. GitHub also starts the smoke suite for successful Vercel Production deployment events.
+Run `pnpm release:check`, deploy the database migration, deploy Vercel, and then run `pnpm test:smoke:production` with `PRODUCTION_URL`. GitHub also starts the smoke suite for successful Vercel Production deployment events. The smoke suite verifies `/`, `/api/health`, production security headers, public accessibility, 320 px reflow, and smoke-account sign-in.
 
 For an application regression, promote the last healthy Vercel deployment. For a database regression, prefer a forward-fix migration. Restore a backup only for destructive data loss, after disabling writes and recording the incident timeline.

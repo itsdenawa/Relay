@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { HelpCircle, Settings } from "lucide-react";
+import { Settings } from "lucide-react";
 import * as m from "motion/react-m";
 
 import { AccountMenu } from "@/features/account-menu";
@@ -92,14 +92,6 @@ export function AppSidebar({ user, workspace, workspaces }: AppSidebarProps) {
       </nav>
 
       <div className="space-y-1 border-t border-sidebar-border p-2.5">
-        <span
-          aria-disabled="true"
-          title="Help"
-          className="flex h-10 cursor-not-allowed items-center justify-center gap-3 rounded-lg px-3 text-sm font-medium text-muted-foreground/55 xl:justify-start"
-        >
-          <HelpCircle className="size-[1.1rem]" />
-          <span className="hidden xl:inline">Help & support</span>
-        </span>
         <PrefetchLink
           href={`/w/${workspace.slug}/settings`}
           title="Settings"
