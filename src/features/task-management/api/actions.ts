@@ -51,6 +51,23 @@ function mutationError(message?: string): TaskActionState {
   };
 }
 
+function taskBoardUrl({
+  workspaceSlug,
+  projectId,
+  view,
+  params,
+}: {
+  workspaceSlug: string;
+  projectId: string;
+  view: "list" | undefined;
+  params: Record<string, string>;
+}) {
+  const searchParams = new URLSearchParams(params);
+  if (view === "list") searchParams.set("view", "list");
+
+  return `/w/${workspaceSlug}/p/${projectId}/board?${searchParams.toString()}`;
+}
+
 export async function createTaskAction(
   _previousState: TaskActionState,
   formData: FormData,
@@ -81,7 +98,12 @@ export async function createTaskAction(
 
   revalidatePath(`/w/${result.data.workspaceSlug}`, "layout");
   redirect(
-    `/w/${result.data.workspaceSlug}/p/${result.data.projectId}/board?created=${data}`,
+    taskBoardUrl({
+      workspaceSlug: result.data.workspaceSlug,
+      projectId: result.data.projectId,
+      view: result.data.view,
+      params: { created: data },
+    }),
   );
 }
 
@@ -113,7 +135,12 @@ export async function updateTaskAction(
 
   revalidatePath(`/w/${result.data.workspaceSlug}`, "layout");
   redirect(
-    `/w/${result.data.workspaceSlug}/p/${result.data.projectId}/board?saved=${result.data.taskId}`,
+    taskBoardUrl({
+      workspaceSlug: result.data.workspaceSlug,
+      projectId: result.data.projectId,
+      view: result.data.view,
+      params: { saved: result.data.taskId },
+    }),
   );
 }
 

@@ -150,6 +150,20 @@ test.describe("task lifecycle", () => {
     await expect(page.getByRole("button", { name: "Labels" })).toHaveCount(0);
     await expect(page.getByRole("button", { name: "New task" })).toBeVisible();
 
+    const quickAdd = page.getByRole("region", { name: "Quick add task" });
+    await quickAdd.getByLabel("Task title").fill("Quick member task");
+    await quickAdd.getByLabel("Quick add status").selectOption({
+      label: "To do",
+    });
+    await quickAdd.getByLabel("Quick add priority").selectOption("low");
+    await quickAdd.getByRole("button", { name: "Add task" }).click();
+    await expect(page).toHaveURL(/created=/);
+    await expect(
+      page
+        .getByRole("article", { name: "To do" })
+        .getByRole("article", { name: "Quick member task" }),
+    ).toBeVisible();
+
     const todo = page.getByRole("article", { name: "To do" });
     await todo.getByRole("button", { name: "Add task" }).click();
     const memberTaskDialog = page.getByRole("dialog");

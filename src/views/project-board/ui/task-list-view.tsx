@@ -34,6 +34,7 @@ type TaskListViewProps = {
   readOnly?: boolean;
   highlightedTaskId?: string | undefined;
   detailsHrefFor: (taskId: string) => string;
+  view?: "board" | "list";
 };
 
 const priorityLabels: Record<TaskPriority, string> = {
@@ -139,6 +140,7 @@ function TaskActions({
   members,
   task,
   readOnly,
+  view,
 }: {
   context: TaskContext;
   columns: ProjectBoardColumn[];
@@ -146,6 +148,7 @@ function TaskActions({
   members: WorkspaceMember[];
   task: Task;
   readOnly: boolean;
+  view: "board" | "list";
 }) {
   if (readOnly) return null;
 
@@ -157,6 +160,7 @@ function TaskActions({
         labels={labels}
         members={members}
         task={task}
+        view={view}
       />
       <MoveTaskSelect
         context={context}
@@ -199,6 +203,7 @@ export function TaskListView({
   readOnly = false,
   highlightedTaskId,
   detailsHrefFor,
+  view = "board",
 }: TaskListViewProps) {
   const columnById = new Map(columns.map((column) => [column.id, column]));
   const memberById = new Map(members.map((member) => [member.id, member]));
@@ -323,6 +328,7 @@ export function TaskListView({
                       members={members}
                       task={task}
                       readOnly={readOnly}
+                      view={view}
                     />
                   </td>
                 </tr>
@@ -381,6 +387,7 @@ export function TaskListView({
                   members={members}
                   task={task}
                   readOnly={readOnly}
+                  view={view}
                 />
               </div>
             </article>

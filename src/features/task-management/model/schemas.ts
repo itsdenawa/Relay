@@ -38,6 +38,7 @@ export const taskContextSchema = z.object({
   workspaceId: z.uuid(),
   workspaceSlug: z.string().min(2).max(48),
   projectId: z.uuid(),
+  view: z.enum(["list"]).optional(),
 });
 
 export const createTaskSchema = taskContextSchema.extend({

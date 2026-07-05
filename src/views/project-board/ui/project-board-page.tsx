@@ -15,6 +15,7 @@ import { ProjectFormDialog } from "@/features/project-management";
 import {
   ProjectLabelsDialog,
   TaskFormDialog,
+  TaskQuickAdd,
 } from "@/features/task-management";
 import { cn } from "@/shared/lib";
 import { Badge, Button } from "@/shared/ui";
@@ -143,6 +144,7 @@ export function ProjectBoardPage({
               labels={labels}
               members={members}
               defaultColumnId={columns[0]?.id}
+              view={view}
             />
           </div>
         ) : null}
@@ -227,6 +229,12 @@ export function ProjectBoardPage({
             visibleTaskCount={visibleTasks.length}
           />
 
+          {!readOnly ? (
+            <div className="mt-4">
+              <TaskQuickAdd context={context} columns={columns} view={view} />
+            </div>
+          ) : null}
+
           <div className="mt-4">
             {view === "list" ? (
               <TaskListView
@@ -238,6 +246,7 @@ export function ProjectBoardPage({
                 readOnly={readOnly}
                 highlightedTaskId={createdTaskId ?? savedTaskId}
                 detailsHrefFor={detailsHrefFor}
+                view={view}
               />
             ) : (
               <KanbanBoard
