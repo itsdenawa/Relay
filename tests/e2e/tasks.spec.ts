@@ -87,6 +87,22 @@ test.describe("task lifecycle", () => {
     await expect(
       page.locator("#main-content").getByText("Showing 1 of 1 active tasks"),
     ).toBeVisible();
+    await page.getByRole("link", { name: /List 1/ }).click();
+    await expect(page).toHaveURL(/view=list/);
+    const listView = page.getByRole("region", { name: "Task list" });
+    await expect(listView).toBeVisible();
+    await expect(
+      listView.getByRole("link", { name: "Publish launch brief" }),
+    ).toBeVisible();
+    await listView.getByRole("link", { name: "Publish launch brief" }).click();
+    await expect(page).toHaveURL(/view=list/);
+    await expect(page).toHaveURL(/task=/);
+    await expect(
+      page.getByRole("dialog", { name: /Publish launch brief/ }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Close task details" }).click();
+    await page.getByRole("link", { name: /Board 1/ }).click();
+    await expect(page).not.toHaveURL(/view=list/);
 
     await page.getByRole("link", { name: "Clear all" }).click();
     const updatedTask = page.getByRole("article", {

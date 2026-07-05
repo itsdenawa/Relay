@@ -45,10 +45,11 @@ async function dragTaskToColumn(
   );
   await page.mouse.down();
   await page.mouse.move(
-    handleBox.x + handleBox.width / 2 + 12,
+    handleBox.x + handleBox.width / 2 + 24,
     handleBox.y + handleBox.height / 2,
-    { steps: 2 },
+    { steps: 4 },
   );
+  await page.waitForTimeout(50);
 
   const overlay = page.locator('[data-testid="task-drag-overlay"]:visible');
   await expect(overlay).toHaveCount(1);

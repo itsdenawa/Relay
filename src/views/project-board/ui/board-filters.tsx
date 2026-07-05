@@ -11,6 +11,7 @@ import { Badge, Button, Input, NativeSelect } from "@/shared/ui";
 
 type BoardFiltersProps = {
   boardUrl: string;
+  view?: "board" | "list";
   filters: TaskFilters;
   labels: ProjectLabel[];
   members: WorkspaceMember[];
@@ -38,10 +39,12 @@ const getServerSnapshot = () => false;
 
 function buildFilterHref(
   boardUrl: string,
+  view: "board" | "list",
   filters: TaskFilters,
   removeKey: "q" | "assignee" | "priority" | "label",
 ) {
   const params = new URLSearchParams();
+  if (view === "list") params.set("view", "list");
   if (filters.query && removeKey !== "q") params.set("q", filters.query);
   if (filters.assigneeId && removeKey !== "assignee") {
     params.set("assignee", filters.assigneeId);
@@ -65,6 +68,7 @@ function submitOnSelectInput(event: FormEvent<HTMLSelectElement>) {
 
 export function BoardFilters({
   boardUrl,
+  view = "board",
   filters,
   labels,
   members,
@@ -98,6 +102,7 @@ export function BoardFilters({
     labelName ? { key: "label" as const, label: `Label: ${labelName}` } : null,
   ].filter((chip): chip is FilterChip => Boolean(chip));
   const hasFilters = chips.length > 0;
+  const clearHref = view === "list" ? `${boardUrl}?view=list` : boardUrl;
 
   return (
     <section aria-label="Task filters" className="mt-4 space-y-3">
@@ -106,6 +111,9 @@ export function BoardFilters({
         method="get"
         className="grid gap-2 rounded-2xl bg-muted/35 p-2 sm:grid-cols-2 lg:grid-cols-[minmax(14rem,1fr)_12rem_10rem_11rem]"
       >
+        {view === "list" ? (
+          <input type="hidden" name="view" value="list" />
+        ) : null}
         <div className="relative">
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -176,7 +184,7 @@ export function BoardFilters({
             >
               {chip.label}
               <Link
-                href={buildFilterHref(boardUrl, filters, chip.key)}
+                href={buildFilterHref(boardUrl, view, filters, chip.key)}
                 aria-label={`Remove ${chip.label} filter`}
                 className="grid size-5 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-background hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none"
               >
@@ -185,7 +193,7 @@ export function BoardFilters({
             </Badge>
           ))}
           <Button asChild variant="ghost" size="sm" className="h-7 px-2">
-            <Link href={boardUrl}>Clear all</Link>
+            <Link href={clearHref}>Clear all</Link>
           </Button>
           <span className="text-xs text-muted-foreground">
             Showing {visibleTaskCount} of {activeTaskCount} active tasks

@@ -1,8 +1,10 @@
-# Tasks and Kanban
+# Tasks, Kanban, and List view
 
 ## Board workflow
 
 `/w/[slug]/p/[projectId]/board` renders the five project columns as a horizontally scrollable Kanban board on smaller screens and a five-column grid on wide screens. Tasks can move within or between columns with a mouse, touch input, or keyboard. The move selector remains available as an explicit fallback.
+
+`/w/[slug]/p/[projectId]/board?view=list` renders the same task dataset as a compact list for scanning, filtering, and opening task details without the spatial Kanban layout. The board and list tabs preserve the current filters, and task-detail links opened from the list keep `view=list` in the URL.
 
 Keyboard drag and drop starts and ends with Space or Enter. Arrow keys move the active task through available drop targets, and Escape cancels the operation. Motion is disabled when the operating system requests reduced motion.
 
@@ -24,6 +26,7 @@ The workspace dashboard derives its project and task metrics from live Supabase 
 
 Board filters remain in the URL and can be shared or refreshed:
 
+- `view=list` opens the compact list view;
 - `q` searches task title and description;
 - `assignee` accepts a membership ID or `unassigned`;
 - `priority` accepts a task priority;
@@ -63,4 +66,4 @@ pnpm test:e2e
 pnpm build
 ```
 
-The database suite covers field validation, relationship integrity, archive behavior, exact ordering and normalization, active-project requirements, Realtime configuration, and Owner/Admin/Member/outsider/anonymous permissions. The browser suite covers full task creation and editing, filters, mouse/touch/keyboard movement, optimistic rollback, cross-client Realtime updates, archive/restore, Member behavior, and the 320 px layout.
+The database suite covers field validation, relationship integrity, archive behavior, exact ordering and normalization, active-project requirements, Realtime configuration, and Owner/Admin/Member/outsider/anonymous permissions. The browser suite covers full task creation and editing, board/list view switching, filters, mouse/touch/keyboard movement, optimistic rollback, cross-client Realtime updates, archive/restore, Member behavior, and the 320 px layout.
