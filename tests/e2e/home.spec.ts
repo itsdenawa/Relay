@@ -40,6 +40,8 @@ test("renders the public landing page for anonymous visitors", async ({
     }),
   ).toBeVisible();
   await expect(page.getByLabel("Relay product preview")).toBeVisible();
+  await expect(page.getByText("From signup to daily flow")).toBeVisible();
+  await expect(page.getByText("Inbox signal")).toBeVisible();
   await expect(
     page.getByRole("link", { name: /Create your workspace/ }),
   ).toHaveAttribute("href", "/signup");
@@ -47,6 +49,17 @@ test("renders the public landing page for anonymous visitors", async ({
     page.getByRole("link", { name: "Sign in" }).first(),
   ).toHaveAttribute("href", "/login");
   await expectNoHorizontalOverflow(page);
+});
+
+test("keeps public and auth routes within a 320px viewport", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 780 });
+
+  for (const path of ["/", "/login", "/signup", "/forgot-password"]) {
+    await page.goto(path);
+    await expectNoHorizontalOverflow(page);
+  }
 });
 
 for (const destination of [
