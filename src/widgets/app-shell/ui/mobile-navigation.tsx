@@ -150,7 +150,7 @@ export function MobileBottomNavigation({
         const active = isNavigationItemActive(pathname, workspaceSlug, item);
 
         const className = cn(
-          "flex flex-col items-center justify-center gap-1 text-[10px] font-medium",
+          "flex min-w-0 flex-col items-center justify-center gap-1 px-1 text-[10px] font-medium",
           disabled
             ? "cursor-not-allowed text-muted-foreground/45"
             : active
@@ -159,8 +159,8 @@ export function MobileBottomNavigation({
         );
         const content = (
           <>
-            <Icon className="size-5" />
-            {label}
+            <Icon className="size-5 shrink-0" />
+            <span className="max-w-full truncate">{label}</span>
           </>
         );
 

@@ -172,6 +172,25 @@ test("opens the navigation drawer on mobile", async ({ page }) => {
   await expectNoHorizontalOverflow(page);
 });
 
+test("keeps core workspace routes within a 320px viewport", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 780 });
+  await signInSeededUser(page);
+
+  for (const path of [
+    "",
+    "/inbox",
+    "/projects",
+    "/members",
+    "/settings",
+    "/settings/profile",
+  ]) {
+    await page.goto(`/w/${seededUser.workspaceSlug}${path}`);
+    await expectNoHorizontalOverflow(page);
+  }
+});
+
 test("redirects authenticated root visits to the current workspace", async ({
   page,
 }) => {
