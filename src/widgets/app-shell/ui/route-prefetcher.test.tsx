@@ -20,6 +20,7 @@ describe("RoutePrefetcher", () => {
     await waitFor(() => {
       expect(prefetch).toHaveBeenCalledWith("/w/northstar");
       expect(prefetch).toHaveBeenCalledWith("/w/northstar/projects");
+      expect(prefetch).toHaveBeenCalledWith("/w/northstar/inbox");
       expect(prefetch).toHaveBeenCalledWith("/w/northstar/members");
       expect(prefetch).toHaveBeenCalledWith("/w/northstar/settings");
       expect(prefetch).toHaveBeenCalledWith("/w/northstar/settings/profile");

@@ -14,6 +14,7 @@ describe("workspace navigation", () => {
     expect(navigation.map((item) => item.label)).toEqual([
       "Overview",
       "Projects",
+      "Inbox",
       "Members",
     ]);
     expect(navigation.every((item) => !item.disabled)).toBe(true);

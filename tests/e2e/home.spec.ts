@@ -51,6 +51,7 @@ test("renders the public landing page for anonymous visitors", async ({
 
 for (const destination of [
   { label: "Projects", path: "projects", heading: "Projects" },
+  { label: "Inbox", path: "inbox", heading: "Inbox" },
   { label: "Members", path: "members", heading: "Members" },
   { label: "Settings", path: "settings", heading: "Settings" },
 ] as const) {

@@ -1,5 +1,6 @@
 import {
   FolderKanban,
+  Inbox,
   LayoutDashboard,
   UsersRound,
   type LucideIcon,
@@ -40,6 +41,11 @@ export function getPrimaryNavigation(workspaceSlug: string): NavigationItem[] {
       href: `${workspacePath}/projects`,
       icon: FolderKanban,
       matchPrefixes: [`${workspacePath}/p/`],
+    },
+    {
+      label: "Inbox",
+      href: `${workspacePath}/inbox`,
+      icon: Inbox,
     },
     {
       label: "Members",
