@@ -43,6 +43,7 @@ type TaskFormDialogProps = {
   buttonSize?: ButtonProps["size"];
   className?: string;
   view?: "board" | "list";
+  initialOpen?: boolean;
 };
 
 export function TaskFormDialog({
@@ -57,8 +58,9 @@ export function TaskFormDialog({
   buttonSize = task ? "icon-sm" : "default",
   className,
   view = "board",
+  initialOpen = false,
 }: TaskFormDialogProps) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(initialOpen);
   const [state, action, pending] = useActionState(
     task ? updateTaskAction : createTaskAction,
     initialTaskActionState,

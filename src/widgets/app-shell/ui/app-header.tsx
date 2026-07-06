@@ -1,9 +1,8 @@
-import { Search } from "lucide-react";
-
 import { AccountMenu } from "@/features/account-menu";
 import { ThemeSwitcher } from "@/features/theme-switcher";
-import { Input, RelayLogo } from "@/shared/ui";
+import { RelayLogo } from "@/shared/ui";
 
+import { CommandPalette } from "./command-palette";
 import { MobileNavigationTrigger } from "./mobile-navigation";
 
 type AppHeaderProps = {
@@ -22,18 +21,7 @@ export function AppHeader({ user, workspace, workspaces }: AppHeaderProps) {
       />
       <RelayLogo className="mr-auto md:hidden" />
 
-      <div className="relative hidden w-full max-w-md sm:block">
-        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          type="search"
-          placeholder="Search projects, tasks, or people…"
-          aria-label="Search"
-          className="bg-muted/60 pl-9 shadow-none"
-        />
-        <kbd className="pointer-events-none absolute top-1/2 right-2.5 hidden -translate-y-1/2 rounded border bg-background px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground lg:block">
-          ⌘K
-        </kbd>
-      </div>
+      <CommandPalette workspace={workspace} workspaces={workspaces} />
 
       <div className="ml-auto flex items-center gap-1 sm:gap-2">
         <ThemeSwitcher />

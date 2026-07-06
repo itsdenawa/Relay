@@ -22,6 +22,7 @@ type ProjectBoardRouteProps = {
     saved?: string;
     changed?: string;
     task?: string;
+    new?: string;
   }>;
 };
 
@@ -83,6 +84,7 @@ export default async function ProjectBoardRoute({
       selectedTaskId={selectedTask?.id}
       initialComments={initialComments}
       initialAttachments={initialAttachments}
+      openNewTask={query.new === "task"}
     />
   );
 }

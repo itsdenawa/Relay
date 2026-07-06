@@ -16,6 +16,7 @@ type ProjectsPageProps = {
   showArchived?: boolean;
   savedProjectId?: string | undefined;
   change?: "archived" | "restored" | undefined;
+  openNewProject?: boolean;
 };
 
 export function ProjectsPage({
@@ -24,6 +25,7 @@ export function ProjectsPage({
   showArchived = false,
   savedProjectId,
   change,
+  openNewProject = false,
 }: ProjectsPageProps) {
   const canManage = workspace.role === "owner" || workspace.role === "admin";
   const activeProjects = projects.filter((project) => !project.archived_at);
@@ -44,7 +46,11 @@ export function ProjectsPage({
           </p>
         </div>
         {canManage ? (
-          <ProjectFormDialog workspace={workspaceReference} />
+          <ProjectFormDialog
+            key={openNewProject ? "new-project-open" : "new-project"}
+            workspace={workspaceReference}
+            initialOpen={openNewProject}
+          />
         ) : null}
       </header>
 

@@ -114,6 +114,33 @@ test("changes and persists the selected theme", async ({ page }) => {
   await expect(page.locator("html")).toHaveClass(/dark/);
 });
 
+test("opens commands from the command palette", async ({ page }) => {
+  await signInSeededUser(page);
+
+  await page.keyboard.press("ControlOrMeta+K");
+  const palette = page.getByRole("dialog", { name: "Command palette" });
+  await expect(palette).toBeVisible();
+  await palette.getByLabel("Search commands").fill("settings");
+  await palette.getByRole("button", { name: /Workspace settings/ }).click();
+  await expect(page).toHaveURL(`/w/${seededUser.workspaceSlug}/settings`);
+  await expect(
+    page.getByRole("heading", { name: "Settings", exact: true }),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: "Open command palette" }).click();
+  const createPalette = page.getByRole("dialog", {
+    name: "Command palette",
+  });
+  await createPalette.getByLabel("Search commands").fill("create project");
+  await createPalette.getByRole("button", { name: /Create project/ }).click();
+  await expect(page).toHaveURL(
+    `/w/${seededUser.workspaceSlug}/projects?new=project`,
+  );
+  await expect(
+    page.getByRole("dialog", { name: "Create project" }),
+  ).toBeVisible();
+});
+
 test("uses compact desktop navigation at tablet width", async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 900 });
   await signInSeededUser(page);

@@ -41,6 +41,7 @@ type ProjectBoardPageProps = {
   selectedTaskId?: string | undefined;
   initialComments: TaskComment[];
   initialAttachments: TaskAttachment[];
+  openNewTask?: boolean;
 };
 
 export function ProjectBoardPage({
@@ -59,6 +60,7 @@ export function ProjectBoardPage({
   selectedTaskId,
   initialComments,
   initialAttachments,
+  openNewTask = false,
 }: ProjectBoardPageProps) {
   const { project, columns } = board;
   const canManageProject =
@@ -139,12 +141,14 @@ export function ProjectBoardPage({
               />
             ) : null}
             <TaskFormDialog
+              key={openNewTask ? "new-task-open" : "new-task"}
               context={context}
               columns={columns}
               labels={labels}
               members={members}
               defaultColumnId={columns[0]?.id}
               view={view}
+              initialOpen={openNewTask}
             />
           </div>
         ) : null}
