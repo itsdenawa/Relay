@@ -230,11 +230,29 @@ export function TaskListView({
     );
   }
 
+  const taskCountLabel =
+    orderedTasks.length === 1 ? "1 task" : `${orderedTasks.length} tasks`;
+
   return (
-    <section aria-label="Task list" className="min-w-0">
-      <div className="hidden overflow-hidden rounded-2xl border bg-card shadow-xs md:block">
+    <section
+      aria-label="Task list"
+      className="min-w-0 overflow-hidden rounded-2xl border bg-card shadow-xs"
+    >
+      <header className="flex flex-col gap-1 border-b bg-muted/25 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-sm font-semibold">List view</h2>
+          <p className="text-xs text-muted-foreground">
+            {taskCountLabel} sorted by workflow status.
+          </p>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Open a task for comments and attachments.
+        </p>
+      </header>
+
+      <div className="hidden md:block">
         <table className="w-full table-fixed text-sm">
-          <thead className="border-b bg-muted/45 text-left text-xs text-muted-foreground">
+          <thead className="border-b bg-muted/35 text-left text-xs text-muted-foreground">
             <tr>
               <th scope="col" className="w-[34%] px-4 py-3 font-medium">
                 Task
@@ -271,7 +289,7 @@ export function TaskListView({
                     task.id === highlightedTaskId && "bg-primary/5",
                   )}
                 >
-                  <td className="px-4 py-3 align-top">
+                  <td className="px-4 py-2.5 align-top">
                     <div className="flex min-w-0 items-start gap-2">
                       {column?.name.toLowerCase() === "done" ? (
                         <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
@@ -294,12 +312,12 @@ export function TaskListView({
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 align-top">
+                  <td className="px-4 py-2.5 align-top">
                     <Badge variant="secondary">
                       {column?.name ?? "Unknown"}
                     </Badge>
                   </td>
-                  <td className="px-4 py-3 align-top">
+                  <td className="px-4 py-2.5 align-top">
                     {assignee ? (
                       <span className="flex min-w-0 items-center gap-2">
                         <Avatar className="size-6">
@@ -317,10 +335,10 @@ export function TaskListView({
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-3 align-top">
+                  <td className="px-4 py-2.5 align-top">
                     <TaskMetaBadges task={task} labels={labels} />
                   </td>
-                  <td className="px-4 py-3 align-top">
+                  <td className="px-4 py-2.5 align-top">
                     <TaskActions
                       context={context}
                       columns={columns}
@@ -338,7 +356,7 @@ export function TaskListView({
         </table>
       </div>
 
-      <div className="grid gap-3 md:hidden">
+      <div className="grid gap-3 p-3 md:hidden">
         {orderedTasks.map((task) => {
           const column = columnById.get(task.column_id);
           const assignee = task.assignee_id
@@ -350,7 +368,7 @@ export function TaskListView({
               key={task.id}
               aria-label={task.title}
               className={cn(
-                "rounded-2xl border bg-card p-4 shadow-xs",
+                "rounded-xl border bg-background p-3 shadow-xs",
                 task.id === highlightedTaskId &&
                   "border-primary/40 ring-2 ring-primary/10",
               )}
@@ -379,7 +397,7 @@ export function TaskListView({
               <div className="mt-3">
                 <TaskMetaBadges task={task} labels={labels} />
               </div>
-              <div className="mt-3 border-t pt-3">
+              <div className="mt-3 border-t pt-2">
                 <TaskActions
                   context={context}
                   columns={columns}
