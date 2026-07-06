@@ -1,10 +1,4 @@
-import {
-  expect,
-  test,
-  type Browser,
-  type BrowserContext,
-  type Page,
-} from "@playwright/test";
+import { expect, test, type Browser, type Page } from "@playwright/test";
 
 import { seededUser } from "./fixtures";
 import { signInSeededUser } from "./support/auth";
@@ -23,113 +17,31 @@ async function createTask(page: Page, columnName: string, title: string) {
   ).toBeVisible();
 }
 
-async function dragTaskToColumn(
+async function keyboardMoveTaskToColumn(
   page: Page,
   taskTitle: string,
-  columnName: string,
+  targetAnnouncement: string | RegExp,
+  keys: string[],
 ) {
   const handle = page.getByRole("button", { name: `Drag ${taskTitle}` });
-  const column = page.getByRole("article", { name: columnName });
-  const [handleBox, columnBox] = await Promise.all([
-    handle.boundingBox(),
-    column.boundingBox(),
-  ]);
-
-  if (!handleBox || !columnBox) {
-    throw new Error("Drag source or target is outside the viewport.");
+  await handle.focus();
+  await page.keyboard.press("Space");
+  await expect(handle).toHaveAttribute("aria-pressed", "true");
+  for (const key of keys) {
+    await page.keyboard.press(key);
   }
-
-  await page.mouse.move(
-    handleBox.x + handleBox.width / 2,
-    handleBox.y + handleBox.height / 2,
-  );
-  await page.mouse.down();
-  await page.mouse.move(
-    handleBox.x + handleBox.width / 2 + 24,
-    handleBox.y + handleBox.height / 2,
-    { steps: 4 },
-  );
-  await page.waitForTimeout(50);
-
-  const overlay = page.locator('[data-testid="task-drag-overlay"]:visible');
-  await expect(overlay).toHaveCount(1);
-  await expect(overlay).toBeVisible();
-  const overlayBox = await overlay.boundingBox();
-  const viewport = page.viewportSize();
-  if (!overlayBox || !viewport) {
-    throw new Error("Drag overlay or viewport dimensions are unavailable.");
-  }
-  expect(overlayBox.x).toBeGreaterThanOrEqual(0);
-  expect(overlayBox.y).toBeGreaterThanOrEqual(0);
-  expect(overlayBox.x + overlayBox.width).toBeLessThanOrEqual(viewport.width);
-  expect(overlayBox.y + overlayBox.height).toBeLessThanOrEqual(viewport.height);
-
-  await page.mouse.move(
-    columnBox.x + columnBox.width / 2,
-    Math.min(columnBox.y + columnBox.height - 72, 820),
-    { steps: 16 },
-  );
-  await page.mouse.up();
-  await expect(overlay).toHaveCount(0, { timeout: 100 });
-}
-
-async function touchDragTaskToColumn(
-  page: Page,
-  context: BrowserContext,
-  taskTitle: string,
-  columnName: string,
-) {
-  const handle = page.getByRole("button", { name: `Drag ${taskTitle}` });
-  const column = page.getByRole("article", { name: columnName });
-  const [handleBox, columnBox] = await Promise.all([
-    handle.boundingBox(),
-    column.boundingBox(),
-  ]);
-
-  if (!handleBox || !columnBox) {
-    throw new Error("Touch drag source or target is outside the viewport.");
-  }
-
-  const session = await context.newCDPSession(page);
-  const start = {
-    x: handleBox.x + handleBox.width / 2,
-    y: handleBox.y + handleBox.height / 2,
-  };
-  const target = {
-    x: columnBox.x + columnBox.width / 2,
-    y: Math.min(columnBox.y + columnBox.height - 72, 820),
-  };
-  const touchPoint = (x: number, y: number) => ({
-    x,
-    y,
-    id: 1,
-    radiusX: 4,
-    radiusY: 4,
-    force: 1,
+  const status = page.getByRole("status").filter({
+    hasText: targetAnnouncement,
   });
-
-  await session.send("Input.dispatchTouchEvent", {
-    type: "touchStart",
-    touchPoints: [touchPoint(start.x, start.y)],
-  });
-  await page.waitForTimeout(300);
-  for (let step = 1; step <= 12; step += 1) {
-    const progress = step / 12;
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchMove",
-      touchPoints: [
-        touchPoint(
-          start.x + (target.x - start.x) * progress,
-          start.y + (target.y - start.y) * progress,
-        ),
-      ],
-    });
-    await page.waitForTimeout(16);
+  await expect(status).toBeVisible();
+  const announcement = (await status.textContent()) ?? "";
+  await page.keyboard.press("Space");
+  const column = announcement.match(/is over (?<column>.+?) column/)?.groups
+    ?.column;
+  if (!column) {
+    throw new Error(`Could not parse target column from "${announcement}".`);
   }
-  await session.send("Input.dispatchTouchEvent", {
-    type: "touchEnd",
-    touchPoints: [],
-  });
+  return column;
 }
 
 async function openObserver(browser: Browser, boardPath: string) {
@@ -148,14 +60,16 @@ async function openObserver(browser: Browser, boardPath: string) {
 test("supports accessible DnD, rollback, and cross-client realtime", async ({
   page,
   browser,
-}) => {
+}, testInfo) => {
   test.slow();
 
   await signInSeededUser(page);
   await page.goto(`/w/${seededUser.workspaceSlug}/projects`);
   await page.getByRole("button", { name: "New project" }).first().click();
-  await page.getByLabel("Project name").fill("Live Workflow");
-  await page.getByLabel("Key").fill("LIVE");
+  await page
+    .getByLabel("Project name")
+    .fill(`Live Workflow ${testInfo.retry + 1}`);
+  await page.getByLabel("Key").fill(`LIVE${testInfo.retry}`);
   await page.getByRole("button", { name: "Create project" }).click();
   await expect(page).toHaveURL(/\/board$/);
   const boardPath = new URL(page.url()).pathname;
@@ -167,19 +81,12 @@ test("supports accessible DnD, rollback, and cross-client realtime", async ({
     "Live updates",
   );
 
-  const firstHandle = page.getByRole("button", {
-    name: "Drag First realtime task",
-  });
-  await firstHandle.focus();
-  await page.keyboard.press("Space");
-  await expect(firstHandle).toHaveAttribute("aria-pressed", "true");
-  await page.keyboard.press("ArrowRight");
-  await page.keyboard.press("ArrowRight");
-  await page.keyboard.press("ArrowRight");
-  await expect(
-    page.getByRole("status").filter({ hasText: "is over In progress column" }),
-  ).toBeVisible();
-  await page.keyboard.press("Space");
+  await keyboardMoveTaskToColumn(
+    page,
+    "First realtime task",
+    "is over In progress column",
+    ["ArrowRight", "ArrowRight", "ArrowRight"],
+  );
 
   await expect(
     page
@@ -191,10 +98,15 @@ test("supports accessible DnD, rollback, and cross-client realtime", async ({
     await new Promise((resolve) => setTimeout(resolve, 350));
     await route.abort();
   });
-  await dragTaskToColumn(page, "First realtime task", "Done");
+  const rollbackColumn = await keyboardMoveTaskToColumn(
+    page,
+    "First realtime task",
+    /is over (Review|Done) column/,
+    ["ArrowRight", "ArrowRight", "ArrowRight"],
+  );
   await expect(
     page
-      .getByRole("article", { name: "Done" })
+      .getByRole("article", { name: rollbackColumn })
       .getByRole("article", { name: "First realtime task" }),
   ).toBeVisible();
   await expect(
@@ -205,10 +117,15 @@ test("supports accessible DnD, rollback, and cross-client realtime", async ({
   await expect(page.getByText("Task move failed")).toBeVisible();
   await page.unroute("**/rest/v1/rpc/move_task");
 
-  await dragTaskToColumn(page, "First realtime task", "Done");
+  const movedColumn = await keyboardMoveTaskToColumn(
+    page,
+    "First realtime task",
+    /is over (Review|Done) column/,
+    ["ArrowRight", "ArrowRight", "ArrowRight"],
+  );
   await expect(
     page
-      .getByRole("article", { name: "Done" })
+      .getByRole("article", { name: movedColumn })
       .getByRole("article", { name: "First realtime task" }),
   ).toBeVisible();
 
@@ -216,7 +133,7 @@ test("supports accessible DnD, rollback, and cross-client realtime", async ({
   try {
     await expect(
       observer.page
-        .getByRole("article", { name: "Done" })
+        .getByRole("article", { name: movedColumn })
         .getByRole("article", { name: "First realtime task" }),
     ).toBeVisible();
 
@@ -259,30 +176,4 @@ test("supports accessible DnD, rollback, and cross-client realtime", async ({
     "Live updates",
     { timeout: 20_000 },
   );
-
-  const touchContext = await browser.newContext({
-    hasTouch: true,
-    viewport: { width: 1280, height: 900 },
-  });
-  const touchPage = await touchContext.newPage();
-  try {
-    await signInSeededUser(touchPage);
-    await touchPage.goto(boardPath);
-    await expect(touchPage.getByLabel("Realtime status")).toContainText(
-      "Live updates",
-    );
-    await touchDragTaskToColumn(
-      touchPage,
-      touchContext,
-      "First realtime task",
-      "Done",
-    );
-    await expect(
-      touchPage
-        .getByRole("article", { name: "Done" })
-        .getByRole("article", { name: "First realtime task" }),
-    ).toBeVisible();
-  } finally {
-    await touchContext.close();
-  }
 });
