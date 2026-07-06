@@ -42,6 +42,8 @@ type TaskFormDialogProps = {
   buttonVariant?: ButtonProps["variant"];
   buttonSize?: ButtonProps["size"];
   className?: string;
+  view?: "board" | "list";
+  initialOpen?: boolean;
 };
 
 export function TaskFormDialog({
@@ -55,8 +57,10 @@ export function TaskFormDialog({
   buttonVariant = task ? "ghost" : "default",
   buttonSize = task ? "icon-sm" : "default",
   className,
+  view = "board",
+  initialOpen = false,
 }: TaskFormDialogProps) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(initialOpen);
   const [state, action, pending] = useActionState(
     task ? updateTaskAction : createTaskAction,
     initialTaskActionState,
@@ -100,6 +104,9 @@ export function TaskFormDialog({
             value={context.workspaceSlug}
           />
           <input type="hidden" name="projectId" value={context.projectId} />
+          {view === "list" ? (
+            <input type="hidden" name="view" value="list" />
+          ) : null}
           {task ? <input type="hidden" name="taskId" value={task.id} /> : null}
 
           <div className="space-y-2">

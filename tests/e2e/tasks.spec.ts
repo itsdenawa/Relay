@@ -87,6 +87,22 @@ test.describe("task lifecycle", () => {
     await expect(
       page.locator("#main-content").getByText("Showing 1 of 1 active tasks"),
     ).toBeVisible();
+    await page.getByRole("link", { name: /List 1/ }).click();
+    await expect(page).toHaveURL(/view=list/);
+    const listView = page.getByRole("region", { name: "Task list" });
+    await expect(listView).toBeVisible();
+    await expect(
+      listView.getByRole("link", { name: "Publish launch brief" }),
+    ).toBeVisible();
+    await listView.getByRole("link", { name: "Publish launch brief" }).click();
+    await expect(page).toHaveURL(/view=list/);
+    await expect(page).toHaveURL(/task=/);
+    await expect(
+      page.getByRole("dialog", { name: /Publish launch brief/ }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Close task details" }).click();
+    await page.getByRole("link", { name: /Board 1/ }).click();
+    await expect(page).not.toHaveURL(/view=list/);
 
     await page.getByRole("link", { name: "Clear all" }).click();
     const updatedTask = page.getByRole("article", {
@@ -133,6 +149,20 @@ test.describe("task lifecycle", () => {
     await page.goto(boardPath);
     await expect(page.getByRole("button", { name: "Labels" })).toHaveCount(0);
     await expect(page.getByRole("button", { name: "New task" })).toBeVisible();
+
+    const quickAdd = page.getByRole("region", { name: "Quick add task" });
+    await quickAdd.getByLabel("Task title").fill("Quick member task");
+    await quickAdd.getByLabel("Quick add status").selectOption({
+      label: "To do",
+    });
+    await quickAdd.getByLabel("Quick add priority").selectOption("low");
+    await quickAdd.getByRole("button", { name: "Add task" }).click();
+    await expect(page).toHaveURL(/created=/);
+    await expect(
+      page
+        .getByRole("article", { name: "To do" })
+        .getByRole("article", { name: "Quick member task" }),
+    ).toBeVisible();
 
     const todo = page.getByRole("article", { name: "To do" });
     await todo.getByRole("button", { name: "Add task" }).click();

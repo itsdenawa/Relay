@@ -26,3 +26,4 @@ export {
 export { ProjectLabelsDialog } from "./ui/project-labels-dialog";
 export { MoveTaskSelect } from "./ui/move-task-select";
 export { TaskFormDialog } from "./ui/task-form-dialog";
+export { TaskQuickAdd } from "./ui/task-quick-add";

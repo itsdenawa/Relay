@@ -11,6 +11,7 @@ type ProjectsRouteProps = {
     archived?: string;
     saved?: string;
     changed?: string;
+    new?: string;
   }>;
 };
 
@@ -38,6 +39,7 @@ export default async function ProjectsRoute({
       showArchived={query.archived === "1"}
       savedProjectId={query.saved}
       change={change}
+      openNewProject={query.new === "project"}
     />
   );
 }

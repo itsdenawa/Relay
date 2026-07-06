@@ -87,6 +87,7 @@ export function TaskDetailsPanel({
   const column = columns.find((candidate) => candidate.id === task.column_id);
   const assignee = members.find((member) => member.id === task.assignee_id);
   const taskLabels = labels.filter((label) => task.labelIds.includes(label.id));
+  const view = searchParams.get("view") === "list" ? "list" : "board";
 
   function closePanel() {
     const nextParams = new URLSearchParams(searchParams.toString());
@@ -130,6 +131,7 @@ export function TaskDetailsPanel({
                   labels={labels}
                   members={members}
                   task={task}
+                  view={view}
                 />
               ) : null}
             </div>

@@ -11,6 +11,7 @@ import { Badge, Button, Input, NativeSelect } from "@/shared/ui";
 
 type BoardFiltersProps = {
   boardUrl: string;
+  view?: "board" | "list";
   filters: TaskFilters;
   labels: ProjectLabel[];
   members: WorkspaceMember[];
@@ -38,10 +39,12 @@ const getServerSnapshot = () => false;
 
 function buildFilterHref(
   boardUrl: string,
+  view: "board" | "list",
   filters: TaskFilters,
   removeKey: "q" | "assignee" | "priority" | "label",
 ) {
   const params = new URLSearchParams();
+  if (view === "list") params.set("view", "list");
   if (filters.query && removeKey !== "q") params.set("q", filters.query);
   if (filters.assigneeId && removeKey !== "assignee") {
     params.set("assignee", filters.assigneeId);
@@ -65,6 +68,7 @@ function submitOnSelectInput(event: FormEvent<HTMLSelectElement>) {
 
 export function BoardFilters({
   boardUrl,
+  view = "board",
   filters,
   labels,
   members,
@@ -98,14 +102,35 @@ export function BoardFilters({
     labelName ? { key: "label" as const, label: `Label: ${labelName}` } : null,
   ].filter((chip): chip is FilterChip => Boolean(chip));
   const hasFilters = chips.length > 0;
+  const clearHref = view === "list" ? `${boardUrl}?view=list` : boardUrl;
 
   return (
-    <section aria-label="Task filters" className="mt-4 space-y-3">
+    <section
+      aria-label="Task filters"
+      className="mt-4 rounded-2xl border bg-card p-3 shadow-xs"
+    >
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-sm font-semibold">Filters</h2>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Showing {visibleTaskCount} of {activeTaskCount} active tasks
+          </p>
+        </div>
+        {hasFilters ? (
+          <Button asChild variant="ghost" size="sm" className="h-7 px-2">
+            <Link href={clearHref}>Clear all</Link>
+          </Button>
+        ) : null}
+      </div>
+
       <form
         key={`${filters.query ?? ""}|${filters.assigneeId ?? ""}|${filters.priority ?? ""}|${filters.labelId ?? ""}`}
         method="get"
-        className="grid gap-2 rounded-2xl bg-muted/35 p-2 sm:grid-cols-2 lg:grid-cols-[minmax(14rem,1fr)_12rem_10rem_11rem]"
+        className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-[minmax(14rem,1fr)_12rem_10rem_11rem]"
       >
+        {view === "list" ? (
+          <input type="hidden" name="view" value="list" />
+        ) : null}
         <div className="relative">
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -113,7 +138,7 @@ export function BoardFilters({
             defaultValue={filters.query}
             placeholder="Search tasks"
             aria-label="Search tasks"
-            className="pl-9"
+            className="bg-muted/35 pl-9 shadow-none"
           />
           <button type="submit" className="sr-only">
             Search
@@ -126,6 +151,7 @@ export function BoardFilters({
           onChange={submitOnSelectChange}
           onInput={submitOnSelectInput}
           disabled={!ready}
+          className="bg-muted/35 shadow-none"
         >
           <option value="">All assignees</option>
           <option value="unassigned">Unassigned</option>
@@ -142,6 +168,7 @@ export function BoardFilters({
           onChange={submitOnSelectChange}
           onInput={submitOnSelectInput}
           disabled={!ready}
+          className="bg-muted/35 shadow-none"
         >
           {priorities.map((priority) => (
             <option key={priority.value} value={priority.value}>
@@ -156,6 +183,7 @@ export function BoardFilters({
           onChange={submitOnSelectChange}
           onInput={submitOnSelectInput}
           disabled={!ready}
+          className="bg-muted/35 shadow-none"
         >
           <option value="">All labels</option>
           {labels.map((label) => (
@@ -167,7 +195,7 @@ export function BoardFilters({
       </form>
 
       {hasFilters ? (
-        <div className="flex flex-wrap items-center gap-2" role="status">
+        <div className="mt-3 flex flex-wrap items-center gap-2" role="status">
           {chips.map((chip) => (
             <Badge
               key={chip.key}
@@ -176,7 +204,7 @@ export function BoardFilters({
             >
               {chip.label}
               <Link
-                href={buildFilterHref(boardUrl, filters, chip.key)}
+                href={buildFilterHref(boardUrl, view, filters, chip.key)}
                 aria-label={`Remove ${chip.label} filter`}
                 className="grid size-5 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-background hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none"
               >
@@ -184,12 +212,6 @@ export function BoardFilters({
               </Link>
             </Badge>
           ))}
-          <Button asChild variant="ghost" size="sm" className="h-7 px-2">
-            <Link href={boardUrl}>Clear all</Link>
-          </Button>
-          <span className="text-xs text-muted-foreground">
-            Showing {visibleTaskCount} of {activeTaskCount} active tasks
-          </span>
         </div>
       ) : null}
     </section>

@@ -37,6 +37,7 @@ type ProjectFormDialogProps = {
   buttonVariant?: ButtonProps["variant"];
   buttonSize?: ButtonProps["size"];
   className?: string;
+  initialOpen?: boolean;
 };
 
 export function ProjectFormDialog({
@@ -45,8 +46,9 @@ export function ProjectFormDialog({
   buttonVariant = project ? "ghost" : "default",
   buttonSize = project ? "sm" : "default",
   className,
+  initialOpen = false,
 }: ProjectFormDialogProps) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(initialOpen);
   const [color, setColor] = useState(project?.color ?? defaultProjectColor);
   const [state, action, pending] = useActionState(
     project ? updateProjectAction : createProjectAction,

@@ -16,11 +16,13 @@ type ProjectBoardRouteProps = {
     assignee?: string;
     priority?: string;
     label?: string;
+    view?: string;
     archived?: string;
     created?: string;
     saved?: string;
     changed?: string;
     task?: string;
+    new?: string;
   }>;
 };
 
@@ -73,6 +75,7 @@ export default async function ProjectBoardRoute({
         priority: priorityResult.success ? priorityResult.data : undefined,
         labelId: query.label,
       }}
+      view={query.view === "list" ? "list" : "board"}
       showArchived={query.archived === "1"}
       createdTaskId={query.created}
       savedTaskId={query.saved}
@@ -81,6 +84,7 @@ export default async function ProjectBoardRoute({
       selectedTaskId={selectedTask?.id}
       initialComments={initialComments}
       initialAttachments={initialAttachments}
+      openNewTask={query.new === "task"}
     />
   );
 }

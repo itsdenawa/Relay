@@ -4,7 +4,7 @@ Relay is an English-language project management SaaS for small product and creat
 
 ## Current state
 
-Stages 1–12 are implemented, with an additional launch polish stage in progress. Relay now includes the complete workspace-isolated product, a public landing page, production hardening, monitoring hooks, analytics, encrypted backups, isolated preview data, release automation, and production smoke coverage.
+Stages 1–13 are implemented. Relay now includes the complete workspace-isolated product, a polished public landing page, responsive authenticated shell, workspace Inbox, command palette, production hardening, monitoring hooks, analytics, encrypted backups, isolated preview data, release automation, and production smoke coverage. Remaining launch work is external production validation and final provider configuration.
 
 Production: [relay-vert-seven.vercel.app](https://relay-vert-seven.vercel.app)
 
@@ -67,11 +67,13 @@ Product motion uses a shared 180 ms timing curve, transform/opacity-first animat
 
 The application shell adapts at three levels:
 
-- Desktop: full sidebar, workspace switcher, search header, and account controls.
+- Desktop: full sidebar, workspace switcher, command palette trigger, and account controls.
 - Tablet: compact icon navigation with the same content hierarchy.
 - Mobile: touch-friendly header, navigation drawer, and fixed quick navigation.
 
-The public landing page explains Relay with a static product preview and clear sign-in/signup actions. The authenticated dashboard reports live project and task totals, highlights workspace momentum, and links directly into project boards. Project boards support mouse, touch, and keyboard drag and drop, with an explicit move menu available as a fallback. Moves appear optimistically, roll back on failure, and reconcile with the server through Supabase Realtime.
+The public landing page explains Relay with a static product preview, a short workspace-to-handoff product story, and clear sign-in/signup actions. The authenticated dashboard reports live project and task totals, highlights workspace momentum, and links directly into project boards. The workspace Inbox surfaces assigned, urgent, due-soon, and recently updated active tasks without adding another data model. Project boards support board and compact list views, quick task creation, filters, mouse/touch/keyboard drag and drop, and an explicit move menu as a fallback. Moves appear optimistically, roll back on failure, and reconcile with the server through Supabase Realtime.
+
+The command palette opens with `⌘K` / `Ctrl+K` and covers primary navigation, workspace switching, settings shortcuts, project creation, and board-specific task/view actions.
 
 Task titles open a responsive details panel whose `task` query parameter preserves direct links and active board filters. The panel provides Realtime comments and private attachments with progress-aware uploads and short-lived signed downloads.
 

@@ -1,6 +1,8 @@
 # Workspaces, members, and invitations
 
-Relay keeps the selected workspace in the URL. The workspace overview lives at `/w/[slug]`, with member management at `/w/[slug]/members` and workspace settings at `/w/[slug]/settings`. Renaming a workspace does not change its slug, so saved links remain stable.
+Relay keeps the selected workspace in the URL. The workspace overview lives at `/w/[slug]`, with attention work at `/w/[slug]/inbox`, member management at `/w/[slug]/members`, and workspace settings at `/w/[slug]/settings`. Renaming a workspace does not change its slug, so saved links remain stable.
+
+The authenticated workspace shell includes a command palette on `⌘K` / `Ctrl+K`. It supports primary navigation, workspace switching, settings shortcuts, project creation through `/projects?new=project`, and board-specific task/view commands when the user is inside a project board. The Inbox is computed from existing active-project tasks: assignments, urgent work, due dates, and recent updates.
 
 ## Roles
 

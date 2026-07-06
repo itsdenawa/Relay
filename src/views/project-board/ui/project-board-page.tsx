@@ -15,6 +15,7 @@ import { ProjectFormDialog } from "@/features/project-management";
 import {
   ProjectLabelsDialog,
   TaskFormDialog,
+  TaskQuickAdd,
 } from "@/features/task-management";
 import { cn } from "@/shared/lib";
 import { Badge, Button } from "@/shared/ui";
@@ -22,6 +23,7 @@ import { ArchivedTaskList, KanbanBoard } from "@/widgets/kanban-board";
 import { TaskDetailsPanel } from "@/widgets/task-details-panel";
 
 import { BoardFilters } from "./board-filters";
+import { TaskListView } from "./task-list-view";
 
 type ProjectBoardPageProps = {
   workspace: CurrentWorkspace;
@@ -30,6 +32,7 @@ type ProjectBoardPageProps = {
   labels: ProjectLabel[];
   members: WorkspaceMember[];
   filters: TaskFilters;
+  view?: "board" | "list";
   showArchived?: boolean;
   createdTaskId?: string | undefined;
   savedTaskId?: string | undefined;
@@ -38,6 +41,7 @@ type ProjectBoardPageProps = {
   selectedTaskId?: string | undefined;
   initialComments: TaskComment[];
   initialAttachments: TaskAttachment[];
+  openNewTask?: boolean;
 };
 
 export function ProjectBoardPage({
@@ -47,6 +51,7 @@ export function ProjectBoardPage({
   labels,
   members,
   filters,
+  view = "board",
   showArchived = false,
   createdTaskId,
   savedTaskId,
@@ -55,6 +60,7 @@ export function ProjectBoardPage({
   selectedTaskId,
   initialComments,
   initialAttachments,
+  openNewTask = false,
 }: ProjectBoardPageProps) {
   const { project, columns } = board;
   const canManageProject =
@@ -70,6 +76,23 @@ export function ProjectBoardPage({
     projectId: project.id,
   };
   const boardUrl = `/w/${workspace.slug}/p/${project.id}/board`;
+  const filtersQuery = new URLSearchParams();
+  if (filters.query) filtersQuery.set("q", filters.query);
+  if (filters.assigneeId) filtersQuery.set("assignee", filters.assigneeId);
+  if (filters.priority) filtersQuery.set("priority", filters.priority);
+  if (filters.labelId) filtersQuery.set("label", filters.labelId);
+  const boardViewHref = `${boardUrl}${
+    filtersQuery.toString() ? `?${filtersQuery.toString()}` : ""
+  }`;
+  const listViewQuery = new URLSearchParams(filtersQuery);
+  listViewQuery.set("view", "list");
+  const listViewHref = `${boardUrl}?${listViewQuery.toString()}`;
+  const detailsHrefFor = (taskId: string) => {
+    const nextParams = new URLSearchParams(filtersQuery);
+    if (view === "list") nextParams.set("view", "list");
+    nextParams.set("task", taskId);
+    return `${boardUrl}?${nextParams.toString()}`;
+  };
 
   return (
     <div className="mx-auto w-full max-w-[1800px]">
@@ -118,11 +141,14 @@ export function ProjectBoardPage({
               />
             ) : null}
             <TaskFormDialog
+              key={openNewTask ? "new-task-open" : "new-task"}
               context={context}
               columns={columns}
               labels={labels}
               members={members}
               defaultColumnId={columns[0]?.id}
+              view={view}
+              initialOpen={openNewTask}
             />
           </div>
         ) : null}
@@ -158,16 +184,28 @@ export function ProjectBoardPage({
         className="mt-6 flex w-fit rounded-lg border bg-muted/40 p-1"
       >
         <Link
-          href={boardUrl}
-          aria-current={!showArchived ? "page" : undefined}
+          href={boardViewHref}
+          aria-current={!showArchived && view === "board" ? "page" : undefined}
           className={cn(
             "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
-            !showArchived
+            !showArchived && view === "board"
               ? "bg-background text-foreground shadow-sm"
               : "text-muted-foreground hover:text-foreground",
           )}
         >
           Board <span className="ml-1 text-xs">{activeTasks.length}</span>
+        </Link>
+        <Link
+          href={listViewHref}
+          aria-current={!showArchived && view === "list" ? "page" : undefined}
+          className={cn(
+            "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+            !showArchived && view === "list"
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          List <span className="ml-1 text-xs">{visibleTasks.length}</span>
         </Link>
         <Link
           href={`${boardUrl}?archived=1`}
@@ -187,6 +225,7 @@ export function ProjectBoardPage({
         <>
           <BoardFilters
             boardUrl={boardUrl}
+            view={view}
             filters={filters}
             labels={labels}
             members={members}
@@ -194,17 +233,37 @@ export function ProjectBoardPage({
             visibleTaskCount={visibleTasks.length}
           />
 
+          {!readOnly ? (
+            <div className="mt-4">
+              <TaskQuickAdd context={context} columns={columns} view={view} />
+            </div>
+          ) : null}
+
           <div className="mt-4">
-            <KanbanBoard
-              context={context}
-              columns={columns}
-              tasks={tasks}
-              labels={labels}
-              members={members}
-              filters={filters}
-              readOnly={readOnly}
-              highlightedTaskId={createdTaskId ?? savedTaskId}
-            />
+            {view === "list" ? (
+              <TaskListView
+                context={context}
+                columns={columns}
+                tasks={visibleTasks}
+                labels={labels}
+                members={members}
+                readOnly={readOnly}
+                highlightedTaskId={createdTaskId ?? savedTaskId}
+                detailsHrefFor={detailsHrefFor}
+                view={view}
+              />
+            ) : (
+              <KanbanBoard
+                context={context}
+                columns={columns}
+                tasks={tasks}
+                labels={labels}
+                members={members}
+                filters={filters}
+                readOnly={readOnly}
+                highlightedTaskId={createdTaskId ?? savedTaskId}
+              />
+            )}
           </div>
         </>
       ) : (

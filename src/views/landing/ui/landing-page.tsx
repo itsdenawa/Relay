@@ -1,9 +1,12 @@
 import Link from "next/link";
 import {
   ArrowRight,
+  CalendarClock,
   CheckCircle2,
   FileLock2,
   FolderKanban,
+  Inbox,
+  ListChecks,
   MessageSquareText,
   RadioTower,
   ShieldCheck,
@@ -61,6 +64,33 @@ const boardColumns = [
   },
 ] as const;
 
+const previewTabs = [
+  { label: "Board", icon: FolderKanban },
+  { label: "List", icon: ListChecks },
+  { label: "Inbox", icon: Inbox },
+] as const;
+
+const workflowSteps = [
+  {
+    title: "Start from a workspace",
+    description:
+      "Create a shared home, invite teammates, and keep roles simple enough to trust.",
+    icon: UsersRound,
+  },
+  {
+    title: "Move work across boards",
+    description:
+      "Use Kanban, compact list view, filters, and quick add without losing task context.",
+    icon: ListChecks,
+  },
+  {
+    title: "Catch what needs attention",
+    description:
+      "Inbox surfaces assignments, urgent tasks, due dates, and recent changes from active projects.",
+    icon: Inbox,
+  },
+] as const;
+
 function ProductPreview() {
   return (
     <div
@@ -68,7 +98,7 @@ function ProductPreview() {
       className="relative rounded-[2rem] border bg-card/95 p-3 shadow-2xl shadow-primary/10 backdrop-blur"
     >
       <div className="rounded-[1.35rem] border bg-background">
-        <div className="flex items-center justify-between gap-3 border-b px-4 py-3">
+        <div className="flex flex-col gap-3 border-b px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex min-w-0 items-center gap-3">
             <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary text-sm font-bold text-primary-foreground">
               N
@@ -80,7 +110,18 @@ function ProductPreview() {
               </p>
             </div>
           </div>
-          <Badge variant="success">Live</Badge>
+          <div className="flex flex-wrap items-center gap-2">
+            {previewTabs.map(({ label, icon: Icon }) => (
+              <span
+                key={label}
+                className="inline-flex h-7 items-center gap-1.5 rounded-full border bg-background px-2.5 text-[11px] font-medium text-muted-foreground"
+              >
+                <Icon className="size-3" />
+                {label}
+              </span>
+            ))}
+            <Badge variant="success">Live</Badge>
+          </div>
         </div>
 
         <div className="grid gap-3 p-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -134,14 +175,14 @@ function ProductPreview() {
           </div>
           <div className="rounded-2xl border bg-card p-4">
             <div className="flex items-center gap-2 text-sm font-semibold">
-              <UsersRound className="size-4 text-primary" />
-              Team clarity
+              <CalendarClock className="size-4 text-primary" />
+              Inbox signal
             </div>
             <dl className="mt-3 grid grid-cols-3 gap-2 text-center">
               {[
-                ["4", "projects"],
-                ["18", "open"],
+                ["2", "due"],
                 ["3", "urgent"],
+                ["6", "updates"],
               ].map(([value, label]) => (
                 <div key={label} className="rounded-xl bg-muted/60 p-2">
                   <dt className="text-base font-semibold">{value}</dt>
@@ -239,6 +280,46 @@ export function LandingPage() {
       </section>
 
       <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+        <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
+          <div className="max-w-2xl">
+            <p className="text-sm font-medium text-primary">
+              From signup to daily flow
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+              Relay keeps the path from plan to handoff short.
+            </h2>
+            <p className="mt-4 text-sm leading-6 text-muted-foreground sm:text-base">
+              The product surface stays intentionally compact: workspace,
+              projects, board/list task views, Inbox, comments, and private
+              attachments.
+            </p>
+          </div>
+
+          <div className="grid gap-3">
+            {workflowSteps.map(({ title, description, icon: Icon }, index) => (
+              <article
+                key={title}
+                className="flex gap-4 rounded-3xl border bg-card p-4 shadow-xs sm:p-5"
+              >
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+                  <Icon className="size-5" />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Step {index + 1}
+                  </p>
+                  <h3 className="mt-1 font-semibold">{title}</h3>
+                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                    {description}
+                  </p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-7xl px-4 pb-16 sm:px-6 lg:px-8 lg:pb-24">
         <div className="max-w-2xl">
           <p className="text-sm font-medium text-primary">
             Designed around real launch work

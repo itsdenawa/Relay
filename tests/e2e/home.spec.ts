@@ -40,6 +40,8 @@ test("renders the public landing page for anonymous visitors", async ({
     }),
   ).toBeVisible();
   await expect(page.getByLabel("Relay product preview")).toBeVisible();
+  await expect(page.getByText("From signup to daily flow")).toBeVisible();
+  await expect(page.getByText("Inbox signal")).toBeVisible();
   await expect(
     page.getByRole("link", { name: /Create your workspace/ }),
   ).toHaveAttribute("href", "/signup");
@@ -49,8 +51,20 @@ test("renders the public landing page for anonymous visitors", async ({
   await expectNoHorizontalOverflow(page);
 });
 
+test("keeps public and auth routes within a 320px viewport", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 780 });
+
+  for (const path of ["/", "/login", "/signup", "/forgot-password"]) {
+    await page.goto(path);
+    await expectNoHorizontalOverflow(page);
+  }
+});
+
 for (const destination of [
   { label: "Projects", path: "projects", heading: "Projects" },
+  { label: "Inbox", path: "inbox", heading: "Inbox" },
   { label: "Members", path: "members", heading: "Members" },
   { label: "Settings", path: "settings", heading: "Settings" },
 ] as const) {
@@ -114,6 +128,33 @@ test("changes and persists the selected theme", async ({ page }) => {
   await expect(page.locator("html")).toHaveClass(/dark/);
 });
 
+test("opens commands from the command palette", async ({ page }) => {
+  await signInSeededUser(page);
+
+  await page.keyboard.press("ControlOrMeta+K");
+  const palette = page.getByRole("dialog", { name: "Command palette" });
+  await expect(palette).toBeVisible();
+  await palette.getByLabel("Search commands").fill("settings");
+  await palette.getByRole("button", { name: /Workspace settings/ }).click();
+  await expect(page).toHaveURL(`/w/${seededUser.workspaceSlug}/settings`);
+  await expect(
+    page.getByRole("heading", { name: "Settings", exact: true }),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: "Open command palette" }).click();
+  const createPalette = page.getByRole("dialog", {
+    name: "Command palette",
+  });
+  await createPalette.getByLabel("Search commands").fill("create project");
+  await createPalette.getByRole("button", { name: /Create project/ }).click();
+  await expect(page).toHaveURL(
+    `/w/${seededUser.workspaceSlug}/projects?new=project`,
+  );
+  await expect(
+    page.getByRole("dialog", { name: "Create project" }),
+  ).toBeVisible();
+});
+
 test("uses compact desktop navigation at tablet width", async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 900 });
   await signInSeededUser(page);
@@ -142,6 +183,25 @@ test("opens the navigation drawer on mobile", async ({ page }) => {
     page.getByRole("navigation", { name: "Mobile primary" }),
   ).toBeVisible();
   await expectNoHorizontalOverflow(page);
+});
+
+test("keeps core workspace routes within a 320px viewport", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 780 });
+  await signInSeededUser(page);
+
+  for (const path of [
+    "",
+    "/inbox",
+    "/projects",
+    "/members",
+    "/settings",
+    "/settings/profile",
+  ]) {
+    await page.goto(`/w/${seededUser.workspaceSlug}${path}`);
+    await expectNoHorizontalOverflow(page);
+  }
 });
 
 test("redirects authenticated root visits to the current workspace", async ({
