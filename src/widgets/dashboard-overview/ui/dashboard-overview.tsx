@@ -11,6 +11,7 @@ import {
   ListTodo,
   MessageSquareText,
   Sparkles,
+  UsersRound,
 } from "lucide-react";
 
 import type { Project } from "@/entities/project";
@@ -452,6 +453,78 @@ export function DashboardOverview({
         </div>
 
         <aside className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+          <section
+            aria-labelledby="workspace-launchpad"
+            className="overflow-hidden rounded-2xl border bg-card shadow-xs sm:col-span-2 xl:col-span-1"
+          >
+            <div className="border-b bg-muted/30 px-4 py-3.5">
+              <div className="flex items-start gap-3">
+                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                  <Sparkles className="size-4" />
+                </span>
+                <div>
+                  <h2
+                    id="workspace-launchpad"
+                    className="text-sm font-semibold"
+                  >
+                    Turn this space into a working board
+                  </h2>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    Three small actions make a new workspace useful fast.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <ol className="divide-y">
+              <LaunchpadStep
+                done={activeProjects.length > 0}
+                title="Create the first project"
+                description="Relay prepares Backlog, To do, In progress, Review, and Done automatically."
+                action={
+                  canManage && !activeProjects.length ? (
+                    <ProjectFormDialog
+                      workspace={{ id: workspace.id, slug: workspace.slug }}
+                      buttonSize="sm"
+                    />
+                  ) : null
+                }
+              />
+              <LaunchpadStep
+                done={totalTrackedTasks > 0}
+                title="Capture visible work"
+                description="Keep tasks small, owned, and clear enough for someone else to pick up."
+                action={
+                  newestProject ? (
+                    <Button asChild variant="outline" size="sm">
+                      <Link
+                        href={`/w/${workspace.slug}/p/${newestProject.id}/board`}
+                      >
+                        Open board
+                        <ArrowRight />
+                      </Link>
+                    </Button>
+                  ) : null
+                }
+              />
+              <LaunchpadStep
+                done={false}
+                title="Invite teammates"
+                description="Bring people in once the first board has shape."
+                action={
+                  canManage ? (
+                    <Button asChild variant="outline" size="sm">
+                      <Link href={`/w/${workspace.slug}/members`}>
+                        Invite team
+                        <UsersRound />
+                      </Link>
+                    </Button>
+                  ) : null
+                }
+              />
+            </ol>
+          </section>
+
           <section className="rounded-2xl border bg-card p-4 shadow-xs">
             <div className="flex items-center gap-2">
               <span className="grid size-8 place-items-center rounded-lg bg-primary/10 text-primary">
@@ -540,5 +613,45 @@ export function DashboardOverview({
         </aside>
       </section>
     </div>
+  );
+}
+
+type LaunchpadStepProps = {
+  done: boolean;
+  title: string;
+  description: string;
+  action?: React.ReactNode;
+};
+
+function LaunchpadStep({
+  done,
+  title,
+  description,
+  action,
+}: LaunchpadStepProps) {
+  return (
+    <li className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex gap-3">
+        <span
+          className={`mt-0.5 grid size-7 shrink-0 place-items-center rounded-full border text-xs ${
+            done
+              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+              : "border-border bg-background text-muted-foreground"
+          }`}
+        >
+          {done ? <CheckCircle2 className="size-4" aria-hidden="true" /> : null}
+          <span className="sr-only">
+            {done ? "Completed step" : "Incomplete step"}
+          </span>
+        </span>
+        <div>
+          <h3 className="font-medium">{title}</h3>
+          <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
+            {description}
+          </p>
+        </div>
+      </div>
+      {action ? <div className="shrink-0 sm:pl-4">{action}</div> : null}
+    </li>
   );
 }
