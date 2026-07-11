@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { AlertTriangle, Camera, KeyRound, UserRound } from "lucide-react";
 
 import type { AccountDeletionBlocker } from "@/entities/user";
@@ -114,6 +114,13 @@ export function AccountSettingsForms({
     deleteAccountAction,
     initialAccountSettingsActionState,
   );
+  const [avatarFileName, setAvatarFileName] = useState<string>();
+  const displayNameError = profileState.fieldErrors?.displayName?.[0];
+  const avatarError = avatarState.fieldErrors?.avatar?.[0];
+  const currentPasswordError = passwordState.fieldErrors?.currentPassword?.[0];
+  const passwordError = passwordState.fieldErrors?.password?.[0];
+  const confirmPasswordError = passwordState.fieldErrors?.confirmPassword?.[0];
+  const confirmationError = deleteState.fieldErrors?.confirmation?.[0];
 
   return (
     <>
@@ -135,11 +142,17 @@ export function AccountSettingsForms({
                 }
                 autoComplete="name"
                 maxLength={80}
-                aria-invalid={Boolean(profileState.fieldErrors?.displayName)}
+                aria-invalid={Boolean(displayNameError)}
+                aria-describedby={
+                  displayNameError ? "profile-display-name-error" : undefined
+                }
               />
-              {profileState.fieldErrors?.displayName?.[0] ? (
-                <p className="text-xs text-destructive">
-                  {profileState.fieldErrors.displayName[0]}
+              {displayNameError ? (
+                <p
+                  id="profile-display-name-error"
+                  className="text-xs text-destructive"
+                >
+                  {displayNameError}
                 </p>
               ) : null}
             </div>
@@ -187,15 +200,33 @@ export function AccountSettingsForms({
                 type="file"
                 accept="image/jpeg,image/png,image/webp,image/avif"
                 className="sr-only"
-                aria-invalid={Boolean(avatarState.fieldErrors?.avatar)}
+                aria-invalid={Boolean(avatarError)}
+                aria-describedby={`profile-avatar-selection${avatarError ? " profile-avatar-error" : ""}`}
+                onChange={(event) =>
+                  setAvatarFileName(event.target.files?.[0]?.name)
+                }
               />
-              {avatarState.fieldErrors?.avatar?.[0] ? (
-                <p className="text-xs text-destructive">
-                  {avatarState.fieldErrors.avatar[0]}
+              <p
+                id="profile-avatar-selection"
+                aria-live="polite"
+                className="truncate text-xs text-muted-foreground"
+              >
+                {avatarFileName ?? "No image selected."}
+              </p>
+              {avatarError ? (
+                <p
+                  id="profile-avatar-error"
+                  className="text-xs text-destructive"
+                >
+                  {avatarError}
                 </p>
               ) : null}
               <FormStatus state={avatarState} />
-              <Button type="submit" size="sm" disabled={avatarPending}>
+              <Button
+                type="submit"
+                size="sm"
+                disabled={!avatarFileName || avatarPending}
+              >
                 {avatarPending ? "Uploading…" : "Upload avatar"}
               </Button>
             </form>
@@ -230,11 +261,17 @@ export function AccountSettingsForms({
               name="currentPassword"
               type="password"
               autoComplete="current-password"
-              aria-invalid={Boolean(passwordState.fieldErrors?.currentPassword)}
+              aria-invalid={Boolean(currentPasswordError)}
+              aria-describedby={
+                currentPasswordError ? "current-password-error" : undefined
+              }
             />
-            {passwordState.fieldErrors?.currentPassword?.[0] ? (
-              <p className="text-xs text-destructive">
-                {passwordState.fieldErrors.currentPassword[0]}
+            {currentPasswordError ? (
+              <p
+                id="current-password-error"
+                className="text-xs text-destructive"
+              >
+                {currentPasswordError}
               </p>
             ) : null}
           </div>
@@ -245,11 +282,16 @@ export function AccountSettingsForms({
               name="password"
               type="password"
               autoComplete="new-password"
-              aria-invalid={Boolean(passwordState.fieldErrors?.password)}
+              aria-invalid={Boolean(passwordError)}
+              aria-describedby={`new-password-hint${passwordError ? " new-password-error" : ""}`}
             />
-            {passwordState.fieldErrors?.password?.[0] ? (
-              <p className="text-xs text-destructive">
-                {passwordState.fieldErrors.password[0]}
+            <p id="new-password-hint" className="text-xs text-muted-foreground">
+              Use 8–72 characters and choose a password different from your
+              current one.
+            </p>
+            {passwordError ? (
+              <p id="new-password-error" className="text-xs text-destructive">
+                {passwordError}
               </p>
             ) : null}
           </div>
@@ -260,11 +302,17 @@ export function AccountSettingsForms({
               name="confirmPassword"
               type="password"
               autoComplete="new-password"
-              aria-invalid={Boolean(passwordState.fieldErrors?.confirmPassword)}
+              aria-invalid={Boolean(confirmPasswordError)}
+              aria-describedby={
+                confirmPasswordError ? "confirm-new-password-error" : undefined
+              }
             />
-            {passwordState.fieldErrors?.confirmPassword?.[0] ? (
-              <p className="text-xs text-destructive">
-                {passwordState.fieldErrors.confirmPassword[0]}
+            {confirmPasswordError ? (
+              <p
+                id="confirm-new-password-error"
+                className="text-xs text-destructive"
+              >
+                {confirmPasswordError}
               </p>
             ) : null}
           </div>
@@ -320,11 +368,19 @@ export function AccountSettingsForms({
               autoComplete="off"
               defaultValue={deleteState.values?.confirmation}
               disabled={blockers.length > 0}
-              aria-invalid={Boolean(deleteState.fieldErrors?.confirmation)}
+              aria-invalid={Boolean(confirmationError)}
+              aria-describedby={
+                confirmationError
+                  ? "delete-account-confirmation-error"
+                  : undefined
+              }
             />
-            {deleteState.fieldErrors?.confirmation?.[0] ? (
-              <p className="text-xs text-destructive">
-                {deleteState.fieldErrors.confirmation[0]}
+            {confirmationError ? (
+              <p
+                id="delete-account-confirmation-error"
+                className="text-xs text-destructive"
+              >
+                {confirmationError}
               </p>
             ) : null}
           </div>
