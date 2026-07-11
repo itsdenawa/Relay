@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import { Button, Input, Label, NativeSelect } from "@/shared/ui";
 
@@ -12,6 +12,11 @@ type InviteMemberFormProps = {
   workspaceSlug: string;
 };
 
+const roleDescriptions = {
+  member: "Can create and update project work, comments, and attachments.",
+  admin: "Can also manage projects, workspace members, and invitations.",
+} as const;
+
 export function InviteMemberForm({
   workspaceId,
   workspaceSlug,
@@ -20,6 +25,10 @@ export function InviteMemberForm({
     inviteMemberAction,
     initialInvitationActionState,
   );
+  const [role, setRole] = useState<keyof typeof roleDescriptions>(
+    state.values?.role === "admin" ? "admin" : "member",
+  );
+  const emailError = state.fieldErrors?.email?.[0];
 
   return (
     <form action={action} className="space-y-4" noValidate>
@@ -34,11 +43,13 @@ export function InviteMemberForm({
             type="email"
             placeholder="teammate@company.com"
             defaultValue={state.values?.email}
-            aria-invalid={Boolean(state.fieldErrors?.email)}
+            aria-invalid={Boolean(emailError)}
+            aria-describedby={emailError ? "invite-email-error" : undefined}
+            autoComplete="email"
           />
-          {state.fieldErrors?.email?.[0] ? (
-            <p className="text-xs text-destructive">
-              {state.fieldErrors.email[0]}
+          {emailError ? (
+            <p id="invite-email-error" className="text-xs text-destructive">
+              {emailError}
             </p>
           ) : null}
         </div>
@@ -47,7 +58,11 @@ export function InviteMemberForm({
           <NativeSelect
             id="invite-role"
             name="role"
-            defaultValue={state.values?.role || "member"}
+            value={role}
+            onChange={(event) =>
+              setRole(event.target.value === "admin" ? "admin" : "member")
+            }
+            aria-describedby="invite-role-description"
           >
             <option value="member">Member</option>
             <option value="admin">Admin</option>
@@ -57,6 +72,15 @@ export function InviteMemberForm({
           {pending ? "Sending…" : "Send invite"}
         </Button>
       </div>
+      <p
+        id="invite-role-description"
+        className="rounded-lg bg-muted/60 px-3 py-2 text-xs leading-5 text-muted-foreground"
+      >
+        <span className="font-medium text-foreground">
+          {role === "admin" ? "Admin access:" : "Member access:"}
+        </span>{" "}
+        {roleDescriptions[role]}
+      </p>
       {state.message ? (
         <p
           role={state.status === "error" ? "alert" : "status"}

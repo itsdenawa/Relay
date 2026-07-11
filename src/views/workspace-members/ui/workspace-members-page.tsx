@@ -77,7 +77,14 @@ export function WorkspaceMembersPage({
             Manage who can access {workspace.name} and what they can do.
           </p>
         </div>
-        <Badge variant="outline">{members.length} members</Badge>
+        <div className="flex flex-wrap gap-2">
+          <Badge variant="outline">
+            {members.length} {members.length === 1 ? "member" : "members"}
+          </Badge>
+          {canManage && invitations.length ? (
+            <Badge variant="secondary">{invitations.length} pending</Badge>
+          ) : null}
+        </div>
       </header>
 
       {transferred ? (
@@ -220,12 +227,15 @@ export function WorkspaceMembersPage({
         <section className="overflow-hidden rounded-2xl border bg-card shadow-sm">
           <div className="flex items-center gap-3 border-b px-5 py-4 sm:px-6">
             <Clock3 className="size-4 text-muted-foreground" />
-            <div>
+            <div className="min-w-0 flex-1">
               <h2 className="font-semibold">Pending invitations</h2>
               <p className="text-xs text-muted-foreground">
                 Resending immediately invalidates the previous link.
               </p>
             </div>
+            {invitations.length ? (
+              <Badge variant="outline">{invitations.length}</Badge>
+            ) : null}
           </div>
           {invitations.length ? (
             <div className="divide-y">
@@ -242,12 +252,17 @@ export function WorkspaceMembersPage({
                         {invitation.email}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        <span className="capitalize">{invitation.role}</span> ·{" "}
-                        {expired
-                          ? "Expired"
-                          : `Expires ${formatDate(invitation.expiresAt)}`}
+                        <span className="capitalize">{invitation.role}</span>
+                        {!expired
+                          ? ` · Expires ${formatDate(invitation.expiresAt)}`
+                          : null}
                       </p>
                     </div>
+                    {expired ? (
+                      <Badge className="w-fit" variant="secondary">
+                        Expired
+                      </Badge>
+                    ) : null}
                     <div className="flex gap-2">
                       <form action={resendInvitationAction}>
                         <input
@@ -265,7 +280,12 @@ export function WorkspaceMembersPage({
                           name="workspaceSlug"
                           value={workspace.slug}
                         />
-                        <Button type="submit" size="sm" variant="outline">
+                        <Button
+                          type="submit"
+                          size="sm"
+                          variant="outline"
+                          aria-label={`Resend invitation to ${invitation.email}`}
+                        >
                           <RefreshCw /> Resend
                         </Button>
                       </form>
@@ -285,7 +305,12 @@ export function WorkspaceMembersPage({
                           name="workspaceSlug"
                           value={workspace.slug}
                         />
-                        <Button type="submit" size="sm" variant="ghost">
+                        <Button
+                          type="submit"
+                          size="sm"
+                          variant="ghost"
+                          aria-label={`Revoke invitation to ${invitation.email}`}
+                        >
                           <Trash2 /> Revoke
                         </Button>
                       </form>
