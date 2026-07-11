@@ -41,9 +41,15 @@ export function TaskQuickAdd({
       aria-label="Quick add task"
       className="rounded-2xl border bg-card p-3 shadow-xs"
     >
+      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-1">
+        <h2 className="text-sm font-semibold">Quick capture</h2>
+        <p className="text-xs text-muted-foreground">
+          Add the essentials now. Open the task later for details.
+        </p>
+      </div>
       <form
         action={action}
-        className="grid gap-2 sm:grid-cols-[minmax(14rem,1fr)_12rem_10rem_auto]"
+        className="grid gap-2 md:grid-cols-2 xl:grid-cols-[minmax(14rem,1fr)_12rem_10rem_auto]"
         noValidate
       >
         <input type="hidden" name="workspaceId" value={context.workspaceId} />
@@ -69,7 +75,20 @@ export function TaskQuickAdd({
             defaultValue={state.values?.title}
             placeholder="Quick add a task…"
             aria-invalid={Boolean(state.fieldErrors?.title)}
+            aria-describedby={
+              state.fieldErrors?.title?.[0]
+                ? `${idPrefix}-title-error`
+                : undefined
+            }
           />
+          {state.fieldErrors?.title?.[0] ? (
+            <p
+              id={`${idPrefix}-title-error`}
+              className="mt-1 px-1 text-xs text-destructive"
+            >
+              {state.fieldErrors.title[0]}
+            </p>
+          ) : null}
         </div>
 
         <div className="min-w-0">
@@ -108,7 +127,11 @@ export function TaskQuickAdd({
           </NativeSelect>
         </div>
 
-        <Button type="submit" disabled={pending} className="sm:w-auto">
+        <Button
+          type="submit"
+          disabled={pending}
+          className="md:col-span-2 xl:col-span-1 xl:w-auto"
+        >
           {pending ? (
             <LoaderCircle className="size-4 animate-spin" />
           ) : (

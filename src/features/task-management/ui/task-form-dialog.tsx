@@ -68,6 +68,9 @@ export function TaskFormDialog({
   const editing = Boolean(task);
   const idPrefix = task?.id ?? `new-${defaultColumnId ?? "task"}`;
   const selectedLabelIds = new Set(state.labelIds ?? task?.labelIds ?? []);
+  const titleError = state.fieldErrors?.title?.[0];
+  const descriptionError = state.fieldErrors?.description?.[0];
+  const dueDateError = state.fieldErrors?.dueDate?.[0];
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -110,19 +113,28 @@ export function TaskFormDialog({
           {task ? <input type="hidden" name="taskId" value={task.id} /> : null}
 
           <div className="space-y-2">
-            <Label htmlFor={`${idPrefix}-title`}>Title</Label>
+            <div className="flex items-center justify-between gap-3">
+              <Label htmlFor={`${idPrefix}-title`}>Title</Label>
+              <span className="text-xs text-muted-foreground">Required</span>
+            </div>
             <Input
               id={`${idPrefix}-title`}
               name="title"
               maxLength={240}
               defaultValue={state.values?.title ?? task?.title}
               placeholder="Prepare launch brief"
-              aria-invalid={Boolean(state.fieldErrors?.title)}
+              aria-invalid={Boolean(titleError)}
+              aria-describedby={
+                titleError ? `${idPrefix}-title-error` : undefined
+              }
               autoFocus
             />
-            {state.fieldErrors?.title?.[0] ? (
-              <p className="text-xs text-destructive">
-                {state.fieldErrors.title[0]}
+            {titleError ? (
+              <p
+                id={`${idPrefix}-title-error`}
+                className="text-xs text-destructive"
+              >
+                {titleError}
               </p>
             ) : null}
           </div>
@@ -138,11 +150,21 @@ export function TaskFormDialog({
               }
               placeholder="Add context, constraints, or acceptance notes."
               className="min-h-28"
-              aria-invalid={Boolean(state.fieldErrors?.description)}
+              aria-invalid={Boolean(descriptionError)}
+              aria-describedby={`${idPrefix}-description-hint${descriptionError ? ` ${idPrefix}-description-error` : ""}`}
             />
-            {state.fieldErrors?.description?.[0] ? (
-              <p className="text-xs text-destructive">
-                {state.fieldErrors.description[0]}
+            <p
+              id={`${idPrefix}-description-hint`}
+              className="text-xs text-muted-foreground"
+            >
+              Optional. Add the outcome, constraints, or definition of done.
+            </p>
+            {descriptionError ? (
+              <p
+                id={`${idPrefix}-description-error`}
+                className="text-xs text-destructive"
+              >
+                {descriptionError}
               </p>
             ) : null}
           </div>
@@ -209,8 +231,19 @@ export function TaskFormDialog({
                 name="dueDate"
                 type="date"
                 defaultValue={state.values?.dueDate ?? task?.due_date ?? ""}
-                aria-invalid={Boolean(state.fieldErrors?.dueDate)}
+                aria-invalid={Boolean(dueDateError)}
+                aria-describedby={
+                  dueDateError ? `${idPrefix}-due-date-error` : undefined
+                }
               />
+              {dueDateError ? (
+                <p
+                  id={`${idPrefix}-due-date-error`}
+                  className="text-xs text-destructive"
+                >
+                  {dueDateError}
+                </p>
+              ) : null}
             </div>
           </div>
 
